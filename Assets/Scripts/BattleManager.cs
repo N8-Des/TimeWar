@@ -9,4 +9,10 @@ public class BattleManager : MonoBehaviour
 
     public LayerMask groundLayerMask;
     public Material lineMat;
+
+
+    public void StartBattle()
+    {
+
+    }
 }

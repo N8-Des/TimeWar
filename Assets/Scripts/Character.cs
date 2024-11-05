@@ -4,5 +4,13 @@ using UnityEngine;
 
 public class Character : MonoBehaviour
 {
+
+
+    //STAT BLOCK
     public float moveDistance = 20;
+    public float alacrity = 0;
+
+
+
+
 }
