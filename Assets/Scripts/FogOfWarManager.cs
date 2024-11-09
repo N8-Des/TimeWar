@@ -12,15 +12,20 @@ public class FogOfWarManager : MonoBehaviour
     
     public Transform minCorner;
     public Transform maxCorner;
-    public float cellSize = 2f;
+    public float cellSize = 1f;
     public float maxVerticalSeparation = 5f;
 
-    Dictionary<Vector2, List<GridNode>> gridNodes;
 
+    public Dictionary<Vector2, List<GridNode>> gridNodes;
+    public Projector projector;
+    public GameObject quad;
+    RenderTexture fogTexture;
+    Texture2D fogBuffer;
 
-
-    public int textureSize = 512;
-    public int rayCount = 180;
+    int cellsX;
+    int cellsZ;
+    float gridWidth;
+    float gridLength;
 
 
 
@@ -43,7 +48,8 @@ public class FogOfWarManager : MonoBehaviour
 
     private void Start()
     {
-        GenerateGrids();
+        GenerateGrids();       
+        InitializeFogTexture();
     }
 
 
@@ -51,13 +57,13 @@ public class FogOfWarManager : MonoBehaviour
     {
         HandleVision();
         FinalizeNodeVisibility();
+        UpdateFogTexture();
     }
 
 
     void HandleVision()
     {
 
-        //this is gonna be so fucking ugly
         for (int i = 0; i < allyCharacters.Count; i++) 
         {
             Character ally = allyCharacters[i];
@@ -73,7 +79,7 @@ public class FogOfWarManager : MonoBehaviour
                         continue;
 
                     RaycastHit hit;
-                    if (Physics.Raycast(allyPosition, node.position - allyPosition, out hit, ally.visionRadius, groundMask))
+                    if (Physics.Raycast(allyPosition + Vector3.up * 2, node.position - allyPosition, out hit, Vector3.Distance(allyPosition, node.position), groundMask))
                     {
                         node.playerVisibility[i] = false;
                     }
@@ -104,12 +110,12 @@ public class FogOfWarManager : MonoBehaviour
         Vector3 gridStart = maxCorner.position;
         Vector3 gridEnd = minCorner.position;
 
-        float gridWidth = Mathf.Abs(gridEnd.x - gridStart.x);
-        float gridLength = Mathf.Abs(gridEnd.z - gridStart.z);
+        gridWidth = Mathf.Abs(gridEnd.x - gridStart.x);
+        gridLength = Mathf.Abs(gridEnd.z - gridStart.z);
 
 
-        int cellsX = Mathf.CeilToInt(gridWidth / cellSize);
-        int cellsZ = Mathf.CeilToInt(gridLength / cellSize);
+        cellsX = Mathf.CeilToInt(gridWidth / cellSize);
+        cellsZ = Mathf.CeilToInt(gridLength / cellSize);
 
         for (int x = 0; x <= cellsX; x++)
         {
@@ -124,6 +130,56 @@ public class FogOfWarManager : MonoBehaviour
         }
     }
 
+
+    void UpdateFogTexture()
+    {
+        Color32[] colors = new Color32[cellsX * cellsZ];
+
+        // Loop through all the grid nodes
+        foreach (var nodeEntry in gridNodes)
+        {
+            Vector2 nodeKey = nodeEntry.Key;
+            List<GridNode> nodesAtPos = nodeEntry.Value;
+
+            foreach (GridNode node in nodesAtPos)
+            {
+                // Calculate the texture coordinates based on node position in world space
+                Vector2 nodePositionInTexture = WorldToTextureCoords(node.position);
+                int x = Mathf.FloorToInt(nodePositionInTexture.x * cellsX);
+                int y = Mathf.FloorToInt(nodePositionInTexture.y * cellsZ);
+
+
+                x = Mathf.Clamp(x, 0, cellsX - 1);
+                y = Mathf.Clamp(y, 0, cellsZ - 1);
+
+                if (node.isVisible)
+                {
+                    colors[y * cellsX + x] = new Color32(255, 255, 255, 100);  // Fully visible (white)
+                }
+                else
+                {
+                    colors[y * cellsX + x] = new Color32(0, 0, 0, 255);  // Unseen (black)
+                }
+            }
+        }
+
+        // Apply the color changes to the texture
+        fogBuffer.SetPixels32(colors);
+        fogBuffer.Apply();  // Apply the changes
+    }
+
+
+
+
+    Vector2 WorldToTextureCoords(Vector3 worldPosition)
+    {
+        // Normalize world position to the texture space (0 to 1)
+        float textureX = (worldPosition.x - minCorner.position.x) / (maxCorner.position.x - minCorner.position.x);
+        float textureY = (worldPosition.z - minCorner.position.z) / (maxCorner.position.z - minCorner.position.z);
+
+
+        return new Vector2(textureX, textureY);
+    }
 
     void CreateNodeLayers(Vector3 startPosition, int gridX, int gridZ)
     {
@@ -186,27 +242,38 @@ public class FogOfWarManager : MonoBehaviour
         }
     }
 
-    //show the grid points
-    private void OnDrawGizmos()
+    void InitializeFogTexture()
     {
-        if (gridNodes == null)
-        {
-            return;
-        }
 
 
-        foreach (var nodeEntry in gridNodes)
-        {
-            Vector2 nodeKey = nodeEntry.Key;
-            List<GridNode> nodesAtPos = nodeEntry.Value;
+        fogBuffer = new Texture2D(cellsX, cellsZ, TextureFormat.R8, false);
 
-            foreach (GridNode node in nodesAtPos)
-            {
-                //change color based on if its visible or not
-                Gizmos.color = node.isVisible ? Color.green : Color.red;
-                Gizmos.DrawSphere(node.position, 0.2f);  
-            }
-        }
+        projector.material.SetTexture("_FogMap", fogBuffer);
+        quad.GetComponent<MeshRenderer>().material.SetTexture("_FogMap", fogBuffer);
 
     }
+
+    //show the grid points
+    //private void OnDrawGizmos()
+    //{
+    //    if (gridNodes == null)
+    //    {
+    //        return;
+    //    }
+
+
+    //    foreach (var nodeEntry in gridNodes)
+    //    {
+    //        Vector2 nodeKey = nodeEntry.Key;
+    //        List<GridNode> nodesAtPos = nodeEntry.Value;
+
+    //        foreach (GridNode node in nodesAtPos)
+    //        {
+    //            //change color based on if its visible or not
+    //            Gizmos.color = node.isVisible ? Color.green : Color.red;
+    //            Gizmos.DrawSphere(node.position, 0.2f);
+    //        }
+    //    }
+
+    //}
 }

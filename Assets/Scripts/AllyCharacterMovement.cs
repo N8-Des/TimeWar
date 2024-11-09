@@ -62,7 +62,6 @@ public class AllyCharacterMovement : MonoBehaviour
     {
         if (hasValidPath)
         { 
-            pathPoints.Add(hoverPositionTrue);
             currentPointIndex = 0;
             isMoving = true;
             pathDisplay.enabled = false;
@@ -131,6 +130,7 @@ public class AllyCharacterMovement : MonoBehaviour
                 NavMesh.CalculatePath(transform.position, hoverPositionNav, NavMesh.AllAreas, path);
             }
 
+
             //make path list
             pathPoints.Clear();
             for (int i = 0; i < path.corners.Length; i++)
@@ -163,6 +163,8 @@ public class AllyCharacterMovement : MonoBehaviour
             List<Vector3> interpolatedPoints = PathInterpolation(pathPoints.ToArray());
             pathDisplay.positionCount = interpolatedPoints.Count;
             pathDisplay.SetPositions(interpolatedPoints.ToArray());
+
+
         }
         else
         {

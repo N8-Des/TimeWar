@@ -1,58 +1,54 @@
-Shader "Custom/FogOfWarSurface"
+Shader "Custom/FogOfWarShader"
 {
     Properties
     {
-        _Color ("Color", Color) = (0,0,0,0.7)
-        _MainTex ("Canvas", 2D) = "white" {}
-        _Smoothness ("Feather", Range(0,0.1)) = 0.005
+        _BaseMap ("Base Map", 2D) = "white" {}
+        _FogMap ("Fog Map", 2D) = "white" {}
+        _FogIntensity ("Fog Intensity", Range(0, 1)) = 0.8
     }
-
     SubShader
-     {
-        Tags { "Queue"="Transparent" "RenderType"="Transparent" "LightMode"="ForwardBase" }
-        Blend SrcAlpha OneMinusSrcAlpha
-        Lighting off
-        LOD 200
-     
-        CGPROGRAM
-        #pragma surface surf NoLighting noambient alpha:blend
-
-        fixed4 _Color;
-        sampler2D _MainTex;
-        float _Smoothness;
-
-        struct Input
+    {
+        Pass
         {
-            float2 uv_MainTex;
-        };
+            CGPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
 
-        fixed4 LightingNoLighting(SurfaceOutput s, fixed3 lightDir, float aten)
-        {
-            fixed4 color;
-            color.rgb = s.Albedo;
-            color.a = s.Alpha;
-            return color;
+            sampler2D _BaseMap;
+            sampler2D _FogMap;
+            float _FogIntensity;
+
+            struct appdata
+            {
+                float4 vertex : POSITION;
+                float2 uv : TEXCOORD0;
+            };
+
+            struct v2f
+            {
+                float2 uv : TEXCOORD0;
+                float4 pos : SV_POSITION;
+            };
+
+            v2f vert (appdata v)
+            {
+                v2f o;
+                o.pos = UnityObjectToClipPos(v.vertex);
+                o.uv = v.uv;
+                return o;
+            }
+
+            fixed4 frag (v2f i) : SV_Target
+            {
+                // Sample base map and fog map
+                fixed4 baseColor = tex2D(_BaseMap, i.uv);
+                fixed4 fogColor = tex2D(_FogMap, i.uv);
+
+                // Blend base color and fog color based on visibility
+                fixed4 finalColor = lerp(baseColor, fogColor, _FogIntensity * fogColor.a);
+                return finalColor;
+            }
+            ENDCG
         }
-
-
-        void surf (Input IN, inout SurfaceOutput o)
-        {
-
-            half4 gaussianH   = tex2D (_MainTex, IN.uv_MainTex + float2(-_Smoothness,0))*0.25;
-            gaussianH  += tex2D (_MainTex, IN.uv_MainTex                         )*0.5  ;
-            gaussianH  += tex2D (_MainTex, IN.uv_MainTex + float2( _Smoothness,0))*0.25;
-
-            half4 gaussianV   = tex2D (_MainTex, IN.uv_MainTex + float2(0,-_Smoothness))*0.25;
-            gaussianV  += tex2D (_MainTex, IN.uv_MainTex                        ) *0.5  ;
-            gaussianV  += tex2D (_MainTex, IN.uv_MainTex + float2(0, _Smoothness))*0.25;
-
-            half4 blurred    = (gaussianH+ gaussianV)*0.5;
-
-            o.Albedo = _Color.rgb * blurred.g;
-            o.Alpha = _Color.a - blurred.g;
-        }
-
-        ENDCG
     }
-    FallBack "Diffuse"
 }
