@@ -1,7 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
+
 
 public class FogOfWarManager : MonoBehaviour
 {
@@ -17,9 +20,8 @@ public class FogOfWarManager : MonoBehaviour
 
 
     public Dictionary<Vector2, List<GridNode>> gridNodes;
-    public Projector projector;
+    public DecalProjector projector;
     public GameObject quad;
-    RenderTexture fogTexture;
     Texture2D fogBuffer;
 
     int cellsX;
@@ -145,21 +147,29 @@ public class FogOfWarManager : MonoBehaviour
             {
                 // Calculate the texture coordinates based on node position in world space
                 Vector2 nodePositionInTexture = WorldToTextureCoords(node.position);
-                int x = Mathf.FloorToInt(nodePositionInTexture.x * cellsX);
-                int y = Mathf.FloorToInt(nodePositionInTexture.y * cellsZ);
+                int centerX = Mathf.FloorToInt(nodePositionInTexture.x * cellsX);
+                int centerY = Mathf.FloorToInt(nodePositionInTexture.y * cellsZ);
 
 
-                x = Mathf.Clamp(x, 0, cellsX - 1);
-                y = Mathf.Clamp(y, 0, cellsZ - 1);
 
-                if (node.isVisible)
+                for (int offsetX = -1; offsetX <= 1; offsetX++)
                 {
-                    colors[y * cellsX + x] = new Color32(255, 255, 255, 100);  // Fully visible (white)
+                    for (int offsetY = -1; offsetY <= 1; offsetY++)
+                    {
+                        int x = Mathf.Clamp(centerX + offsetX, 0, cellsX - 1);
+                        int y = Mathf.Clamp(centerY + offsetY, 0, cellsZ - 1);
+                        if (node.isVisible)
+                        {
+                            colors[y * cellsX + x] = new Color32(255, 255, 255, 100);  // Fully visible (white)
+                        }
+                        else
+                        {
+                            colors[y * cellsX + x] = new Color32(0, 0, 0, 255);  // Unseen (black)
+                        }
+                    }
                 }
-                else
-                {
-                    colors[y * cellsX + x] = new Color32(0, 0, 0, 255);  // Unseen (black)
-                }
+
+
             }
         }
 
@@ -198,14 +208,14 @@ public class FogOfWarManager : MonoBehaviour
         foreach (RaycastHit hit in hits)
         {
             bool isNewLayer = true;
-            foreach(float height in heights)
+            /*foreach(float height in heights)
             {
                 if(Mathf.Abs(height - hit.point.y) < maxVerticalSeparation)
                 {
                     isNewLayer = false;
                     break;
                 }
-            }
+            }*/
 
             if (isNewLayer)
             {
@@ -246,10 +256,11 @@ public class FogOfWarManager : MonoBehaviour
     {
 
 
-        fogBuffer = new Texture2D(cellsX, cellsZ, TextureFormat.R8, false);
+        fogBuffer = new Texture2D(cellsX, cellsZ, TextureFormat.RGBAFloat, false);
+        fogBuffer.filterMode = FilterMode.Bilinear;
 
         projector.material.SetTexture("_FogMap", fogBuffer);
-        quad.GetComponent<MeshRenderer>().material.SetTexture("_FogMap", fogBuffer);
+        //quad.GetComponent<MeshRenderer>().material.SetTexture("_FogMap", fogBuffer);
 
     }
 
@@ -270,10 +281,9 @@ public class FogOfWarManager : MonoBehaviour
     //        foreach (GridNode node in nodesAtPos)
     //        {
     //            //change color based on if its visible or not
-    //            Gizmos.color = node.isVisible ? Color.green : Color.red;
+    //            Gizmos.color = node.isVisible ? UnityEngine.Color.green : UnityEngine.Color.red;
     //            Gizmos.DrawSphere(node.position, 0.2f);
     //        }
     //    }
-
     //}
 }

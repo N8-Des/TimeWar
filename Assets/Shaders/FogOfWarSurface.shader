@@ -2,22 +2,22 @@ Shader "Custom/FogOfWarShader"
 {
     Properties
     {
-        _BaseMap ("Base Map", 2D) = "white" {}
-        _FogMap ("Fog Map", 2D) = "white" {}
-        _FogIntensity ("Fog Intensity", Range(0, 1)) = 0.8
+        _FogMap ("FogMap", 2D) = "white" {}
+        _DesaturationAmount ("Desaturation Amount", Range(0, 1)) = 0.8
+        _FeatherAmount ("Feather Amount", Range(0, 1)) = 0.2
     }
     SubShader
     {
+        Tags { "RenderType"="Transparent" }
+        LOD 200
+        
         Pass
         {
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
-
-            sampler2D _BaseMap;
-            sampler2D _FogMap;
-            float _FogIntensity;
-
+            #include "UnityCG.cginc"
+            
             struct appdata
             {
                 float4 vertex : POSITION;
@@ -26,9 +26,14 @@ Shader "Custom/FogOfWarShader"
 
             struct v2f
             {
-                float2 uv : TEXCOORD0;
                 float4 pos : SV_POSITION;
+                float2 uv : TEXCOORD0;
             };
+
+            sampler2D _MainTex;
+            sampler2D _FogTexture;
+            float _DesaturationAmount;
+            float _FeatherAmount;
 
             v2f vert (appdata v)
             {
@@ -37,16 +42,24 @@ Shader "Custom/FogOfWarShader"
                 o.uv = v.uv;
                 return o;
             }
-
-            fixed4 frag (v2f i) : SV_Target
+            
+            float4 frag (v2f i) : SV_Target
             {
-                // Sample base map and fog map
-                fixed4 baseColor = tex2D(_BaseMap, i.uv);
-                fixed4 fogColor = tex2D(_FogMap, i.uv);
+                float4 color = tex2D(_MainTex, i.uv); // Original scene color
+                float fogValue = tex2D(_FogTexture, i.uv).r; // Fog texture value (red channel)
 
-                // Blend base color and fog color based on visibility
-                fixed4 finalColor = lerp(baseColor, fogColor, _FogIntensity * fogColor.a);
-                return finalColor;
+                // Feathering effect
+                fogValue = saturate(fogValue * (1.0 + _FeatherAmount) - _FeatherAmount);
+
+                // Desaturate when unseen
+                float desaturationFactor = lerp(1.0, _DesaturationAmount, 1.0 - fogValue);
+                float grayscale = dot(color.rgb, float3(0.3, 0.59, 0.11));
+                color.rgb = lerp(float3(grayscale, grayscale, grayscale), color.rgb, desaturationFactor);
+
+                // Apply transparency
+                color.a = fogValue;
+
+                return color;
             }
             ENDCG
         }
