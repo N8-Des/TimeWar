@@ -4,6 +4,7 @@ using System.IO;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.EventSystems;
 
 public class AllyCharacterMovement : MonoBehaviour
 {
@@ -79,7 +80,7 @@ public class AllyCharacterMovement : MonoBehaviour
         else
         {
             GetPath();
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
             {
                 ClickPosition();
             }
