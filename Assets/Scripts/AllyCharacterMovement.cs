@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
@@ -8,29 +9,36 @@ using UnityEngine.EventSystems;
 
 public class AllyCharacterMovement : MonoBehaviour
 {
-
-    public float moveSpeed = 16f;
+    public float moveSpeed = 25;
 
     Vector3 hoverPositionNav = Vector3.zero;
-    LineRenderer pathDisplay;
-    Vector3 hoverPositionTrue = Vector3.zero;
-    GameObject positionIndicator;
+
     NavMeshPath path;
     float pathInterpDist = 2;
     List<Vector3> pathPoints = new List<Vector3>();
+    List<Vector3> extraPathPoints = new List<Vector3>();
     List<int> navLinkPoints = new List<int>();
+    PlayerPathRenderer pathRenderer;
 
     BattleManager battleManager;
     NavMeshAgent myAgent;
     Character myCharacter;
 
 
+    //abilities
+    bool inAbilitySelect = false;
+    Character targetCharacter;
+    Vector3 abilityTargetPosition;
+    public int selectedAbilityIndex;
+    Ability selectedAbility;
+    bool validAbility;
+    bool needMovementForAbility = false;
+
     //movement
     int currentPointIndex = 0;
-
     bool isMoving = false;
     bool hasValidPath = false;
-
+    float currentPathDistance;
 
 
     private void Start()
@@ -41,11 +49,14 @@ public class AllyCharacterMovement : MonoBehaviour
         //get values from Battle Manager
         battleManager = FindObjectOfType<BattleManager>();
 
-        //create line
-        pathDisplay = gameObject.AddComponent<LineRenderer>();
-        pathDisplay.widthMultiplier = 0.15f;
-        pathDisplay.colorGradient = battleManager.pathValidGradient;
-        pathDisplay.material = battleManager.lineMat;
+        //create line (should probably just turn this into a prefab)
+        GameObject pathObject = Resources.Load<GameObject>("PathLineRenderer");
+        pathObject = Instantiate(pathObject);
+        pathObject.transform.SetParent(transform);
+        pathObject.transform.localPosition = Vector3.zero;
+        pathObject.transform.eulerAngles = new(90, 0, 0);
+        pathRenderer = pathObject.GetComponent<PlayerPathRenderer>();
+
 
         //create line end indicator
         /*positionIndicator = Resources.Load<GameObject>("RadiusSelector");
@@ -59,14 +70,33 @@ public class AllyCharacterMovement : MonoBehaviour
     }
 
 
+    public void StartAbilitySelection(int index)
+    {
+        selectedAbilityIndex = index;
+        inAbilitySelect = true;
+        pathRenderer.pathDisplay.enabled = false;
+        pathRenderer.extraPathDisplay.enabled = false;
+        targetCharacter = null;
+        selectedAbility = myCharacter.abilities[selectedAbilityIndex];
+    }
+
+    public void EndAbilitySelection()
+    {
+        inAbilitySelect = false;
+        selectedAbility.EndDisplay();
+        pathRenderer.pathDisplay.enabled = true;
+    }
+
     private void ClickPosition()
     {
         if (hasValidPath)
         { 
             currentPointIndex = 0;
             isMoving = true;
-            pathDisplay.enabled = false;
+            pathRenderer.pathDisplay.enabled = false;
             myAgent.enabled = false;
+            pathRenderer.extraPathDisplay.enabled = false;
+
         }
     }
 
@@ -79,24 +109,108 @@ public class AllyCharacterMovement : MonoBehaviour
         }
         else
         {
-            GetPath();
-            if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
+            if (!inAbilitySelect)
             {
-                ClickPosition();
+                GetPath();
+                if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
+                {
+                    ClickPosition();
+                }
             }
+            else
+            {
+                DisplayAbility();
+
+                if (Input.GetMouseButtonDown(0))
+                {
+                    if (validAbility)
+                    {
+                        if (needMovementForAbility)
+                        {
+                            ClickPosition();
+                            selectedAbility.EndDisplay();
+                        }
+                        else
+                        {
+                            selectedAbility.Execute(myCharacter, targetCharacter, abilityTargetPosition);
+                            EndAbilitySelection();
+                        }
+                    }
+                }
+
+                if (Input.GetMouseButtonDown(1))
+                {
+                    EndAbilitySelection();
+                    selectedAbility.EndDisplay();
+                }
+            }
+          
         }
     }
 
+
+    void DisplayAbility()
+    {
+        Vector3 mousePosition = Input.mousePosition;
+        Ray ray = Camera.main.ScreenPointToRay(mousePosition);
+        if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, battleManager.abilityLayerMask) && !isMoving)
+        {
+            abilityTargetPosition = hit.point;
+            //check if you hit a character
+            if (hit.transform.gameObject.GetComponentInParent<Character>() != null)
+            {
+                targetCharacter = hit.transform.gameObject.GetComponentInParent<Character>();
+            }
+        }
+        if (Vector3.Distance(abilityTargetPosition, transform.position) >= selectedAbility.attackRange)
+        {
+            Vector3 targetPosition = GetMaxAbilityDistance(transform.position, abilityTargetPosition, selectedAbility.attackRange);
+            NavMesh.CalculatePath(transform.position, targetPosition, NavMesh.AllAreas, path);
+
+
+            if (path.status != NavMeshPathStatus.PathInvalid && GetTotalDistance(path.corners) <= myCharacter.currentMoveDistance)
+            {
+                selectedAbility.DisplaySpell(targetPosition, hit.point, myCharacter);
+                needMovementForAbility = true;
+                hasValidPath = true;
+
+                pathPoints.Clear();
+                for (int i = 0; i < path.corners.Length; i++)
+                {
+                    pathPoints.Add(path.corners[i]);
+                }
+                GetLinkedPaths();
+
+                pathRenderer.pathDisplay.enabled = true;
+                SetPathDisplay(false);
+                validAbility = selectedAbility.IsValidSpell(targetPosition, (abilityTargetPosition - targetPosition).normalized, targetCharacter);
+            }
+            else
+            {
+                validAbility = false;
+                hasValidPath = false;
+            }
+
+        }
+        else
+        {
+            selectedAbility.DisplaySpell(transform.position, hit.point, myCharacter);
+            validAbility = selectedAbility.IsValidSpell(transform.position, (abilityTargetPosition - transform.position).normalized, targetCharacter);
+            needMovementForAbility = false;
+            pathRenderer.pathDisplay.enabled = false;
+        }
+
+
+
+
+    }
 
     //movement
     void FollowPath()
     {
         Vector3 targetPoint = pathPoints[currentPointIndex];
 
-
         transform.position = Vector3.MoveTowards(transform.position, targetPoint, moveSpeed * Time.deltaTime);
-
-
 
         if (Vector3.Distance(transform.position, targetPoint) < 0.1f)
         {
@@ -105,9 +219,19 @@ public class AllyCharacterMovement : MonoBehaviour
             if (currentPointIndex >= pathPoints.Count)
             {
                 isMoving = false;
-                pathDisplay.positionCount = 0;
-                pathDisplay.enabled = true;
+                pathRenderer.pathDisplay.positionCount = 0;
+                pathRenderer.pathDisplay.enabled = true;
+                path.ClearCorners();
                 myAgent.enabled = true;
+                myCharacter.currentMoveDistance -= currentPathDistance;
+                if(inAbilitySelect)
+                {
+                    selectedAbility.Execute(myCharacter, targetCharacter, targetPoint);
+                    EndAbilitySelection();
+                }
+                pathRenderer.extraPathDisplay.positionCount = 0;
+                pathRenderer.extraPathDisplay.enabled = true;
+                extraPathPoints.Clear();
 
             }
         }
@@ -123,7 +247,6 @@ public class AllyCharacterMovement : MonoBehaviour
             && NavMesh.SamplePosition(hit.point, out NavMeshHit navHit, myAgent.radius, NavMesh.AllAreas))
         {
             SetValidPath(true);
-            hoverPositionTrue = hit.point;
             //do navigation calculation
             if (Vector3.Distance(hit.point, hoverPositionNav) > 1)
             {
@@ -145,33 +268,7 @@ public class AllyCharacterMovement : MonoBehaviour
             SetValidPath(false);
         }
 
-        //determine if the path crosses any links
-
-        //if our hovered cursor exceeds the limit of our player's movement    
-        if (GetTotalDistance(path.corners) > myCharacter.moveDistance)
-        {
-            SetValidPath(false);
-            Vector4 edgePoint = GetMaxDistanceOnPath(pathPoints.ToArray());
-            int lastIndex = (int)edgePoint.w;
-            pathPoints[lastIndex] = edgePoint;
-            pathPoints.RemoveRange(lastIndex + 1, pathPoints.Count - (lastIndex + 1));
-        }
-        
-
-        //finally, interpolate the path 
-        if (pathPoints.Count > 1)
-        {
-            List<Vector3> interpolatedPoints = PathInterpolation(pathPoints.ToArray());
-            pathDisplay.positionCount = interpolatedPoints.Count;
-            pathDisplay.SetPositions(interpolatedPoints.ToArray());
-
-
-        }
-        else
-        {
-            pathDisplay.positionCount = pathPoints.Count;
-            pathDisplay.SetPositions(pathPoints.ToArray());
-        }
+        SetPathDisplay(true);
 
     }
 
@@ -179,44 +276,95 @@ public class AllyCharacterMovement : MonoBehaviour
     void SetValidPath(bool isValid)
     {
         hasValidPath = isValid;
-        if (isValid)
-        {
-            pathDisplay.colorGradient = battleManager.pathValidGradient;
-        }
+        pathRenderer.SetPathMaterial(isValid);
     }
 
 
-    void SetPathGradient()
+    void SetPathDisplay(bool isInterpolated)
     {
-        float amtOver = GetTotalDistance(path.corners) - myCharacter.moveDistance;
-        if (amtOver > 0)
+        //determine if the path crosses any links
+        if (myCharacter.currentMoveDistance <= 0)
         {
-            float amtOverPercent = amtOver / GetTotalDistance(path.corners);
-            AddColorKey(battleManager.pathInvalidColor, Mathf.Abs( 1 - amtOverPercent));
-
+            SetValidPath(false);
         }
+        //if our hovered cursor exceeds the limit of our player's movement    
+        else if (GetTotalDistance(path.corners) > myCharacter.currentMoveDistance)
+        {
+            Vector4 edgePoint = GetMaxDistanceOnPath(pathPoints.ToArray(), myCharacter.currentMoveDistance);
+            int lastIndex = (int)edgePoint.w;
+
+            //handle the extra distance in red
+            pathRenderer.extraPathDisplay.enabled = true;
+            extraPathPoints.Clear();
+            extraPathPoints.Add(edgePoint);
+            for (int i = lastIndex + 1; i < pathPoints.Count; i++)
+            {
+                extraPathPoints.Add(pathPoints[i]);
+            }
+
+            if (extraPathPoints.Count > 1 && isInterpolated)
+            {
+                List<Vector3> interpolatedPoints = PathInterpolation(extraPathPoints.ToArray());
+                pathRenderer.extraPathDisplay.positionCount = interpolatedPoints.Count;
+                for (int i = 0; i < interpolatedPoints.Count; i++)
+                {
+                    interpolatedPoints[i] += Vector3.up;
+                }
+                pathRenderer.extraPathDisplay.SetPositions(interpolatedPoints.ToArray());
+            }
+            else
+            {
+                pathRenderer.extraPathDisplay.positionCount = extraPathPoints.Count;
+                List<Vector3> pathRenderPoints = new(extraPathPoints);
+                for (int i = 0; i < pathRenderPoints.Count; i++)
+                {
+                    pathRenderPoints[i] += Vector3.up;
+                }
+                pathRenderer.extraPathDisplay.SetPositions(pathRenderPoints.ToArray());
+            }
+            //remove any points on the blue path that are outside of our movespeed zone
+            pathPoints[lastIndex + 1] = edgePoint;
+            if (pathPoints.Count > lastIndex + 1)
+            {
+                for(int i = pathPoints.Count -1; i > lastIndex + 1; i--)
+                {
+                    pathPoints.RemoveAt(i);
+                }
+            }
+        }
+        else
+        {
+            pathRenderer.extraPathDisplay.enabled = false;
+        }
+
+
+        //finally, interpolate the path 
+        if (pathPoints.Count > 1 && isInterpolated)
+        {
+            List<Vector3> interpolatedPoints = PathInterpolation(pathPoints.ToArray());
+            pathRenderer.pathDisplay.positionCount = interpolatedPoints.Count;
+            for (int i = 0; i < interpolatedPoints.Count; i++)
+            {
+                interpolatedPoints[i] += Vector3.up;
+            }
+            pathRenderer.pathDisplay.SetPositions(interpolatedPoints.ToArray());
+        }
+        else
+        {
+            pathRenderer.pathDisplay.positionCount = pathPoints.Count;
+            List<Vector3> pathRenderPoints = new(pathPoints);
+            for (int i = 0; i < pathRenderPoints.Count; i++)
+            {
+                pathRenderPoints[i] += Vector3.up;
+            }
+            pathRenderer.pathDisplay.SetPositions(pathRenderPoints.ToArray());
+        }
+        currentPathDistance = GetTotalDistance(path.corners);
     }
 
 
     #region line visuals
-    void AddColorKey(Color color, float time)
-    {
-        GradientColorKey[] existingKeys = battleManager.pathValidGradient.colorKeys;
-
-        GradientColorKey[] newKeys = new GradientColorKey[existingKeys.Length + 2];
-
-        for (int i = 0; i < existingKeys.Length; i++)
-        {
-            newKeys[i] = existingKeys[i];
-        }
-        newKeys[newKeys.Length - 1] = new GradientColorKey(newKeys[0].color, time);
-        newKeys[newKeys.Length - 3] = new GradientColorKey(color, 1);
-        newKeys[newKeys.Length - 2] = new GradientColorKey(color, time + 0.01f);
-        Gradient gradient = new Gradient();
-        gradient.colorKeys = newKeys;
-        pathDisplay.colorGradient = gradient;
-
-    }
+   
 
 
     public List<Vector3> PathInterpolation(Vector3[] corners)
@@ -254,12 +402,22 @@ public class AllyCharacterMovement : MonoBehaviour
         return points;
     }
 
+    Vector3 GetMaxAbilityDistance(Vector3 start, Vector3 end, float maxDistance)
+    {
+        Vector3 maxPoint = Vector3.zero;
+        float totalDistance = Vector3.Distance(start, end);
+        float extraDistance = totalDistance - maxDistance;
+        Vector3 direction = end - start;
+        direction.Normalize();
+        maxPoint = start + (direction * extraDistance);
+        return maxPoint;
+    }
 
     Vector3 SnapToGround(Vector3 point)
     {
         RaycastHit hit;
         Vector3 pointAbove = point + Vector3.up * 50;
-        if (Physics.Raycast(pointAbove, Vector3.down, out hit, Mathf.Infinity))
+        if (Physics.Raycast(pointAbove, Vector3.down, out hit, Mathf.Infinity, battleManager.groundLayerMask))
         {
             return hit.point;
         }
@@ -302,7 +460,7 @@ public class AllyCharacterMovement : MonoBehaviour
 
 
 
-    Vector4 GetMaxDistanceOnPath(Vector3[] points)
+    Vector4 GetMaxDistanceOnPath(Vector3[] points, float maxDistance)
     {
         Vector4 finalPoint = Vector4.zero;
         float totalDistance = 0;
@@ -312,11 +470,11 @@ public class AllyCharacterMovement : MonoBehaviour
             if (!navLinkPoints.Contains(i))
             {
                 totalDistance += Vector3.Distance(points[i], points[i + 1]);
-                if (totalDistance > myCharacter.moveDistance)
+                if (totalDistance > maxDistance)
                 {
                     //get the amount of distance the player has left.
                     totalDistance -= Vector3.Distance(points[i], points[i + 1]);
-                    float extra = myCharacter.moveDistance - totalDistance;
+                    float extra = maxDistance - totalDistance;
                     Vector3 direction = points[i + 1] - points[i];
                     direction = Vector3.Normalize(direction);
                     finalPoint = points[i] + (direction * extra);

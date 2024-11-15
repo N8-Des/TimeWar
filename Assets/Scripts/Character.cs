@@ -15,6 +15,7 @@ public class Character : MonoBehaviour
     public float moveDistance = 30;
     public int alacrity = 0;
     public float visionRadius = 20;
+    public float currentMoveDistance;
 
     public int strength;
     public int dexterity;
@@ -33,6 +34,12 @@ public class Character : MonoBehaviour
     public void TakeDamage(int damage, Character source, DamageType damageType)
     {
 
+    }
+
+
+    public void StartRound()
+    {
+        currentMoveDistance = moveDistance;
     }
 
     public int GetScoreWithEnum(Stat stat)

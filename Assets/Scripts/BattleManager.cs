@@ -8,7 +8,11 @@ public class BattleManager : MonoBehaviour
     public Color pathInvalidColor;
 
     public LayerMask groundLayerMask;
+    public LayerMask abilityLayerMask;
+
     public Material lineMat;
+    public Material abilityLineMat;
+    public Material radiusMat;
 
     public AbilityDisplay abilityDisplay;
 
@@ -17,6 +21,9 @@ public class BattleManager : MonoBehaviour
     public int currentTurn;
     public int currentRound;
 
+
+    Character currentCharacter;
+    AllyCharacterMovement characterMovement;
 
     private void Start()
     {
@@ -45,9 +52,16 @@ public class BattleManager : MonoBehaviour
         SetCurrentCharacter(initiative[currentTurn].Item1);
     }
 
+    public void SelectAbility(int index)
+    {
+        characterMovement.StartAbilitySelection(index);
+    }
+
 
     public void SetCurrentCharacter(Character character)
     {
+        currentCharacter = character;
+        characterMovement = character.GetComponent<AllyCharacterMovement>();
         for (int i = 0; i < character.abilities.Count; i++)
         {
             abilityDisplay.abilityButtons[i].SetAbility(character.abilities[i], character);
@@ -56,5 +70,6 @@ public class BattleManager : MonoBehaviour
         {
             abilityDisplay.abilityButtons[i].enabled = false;
         }
+        currentCharacter.StartRound();
     }
 }
