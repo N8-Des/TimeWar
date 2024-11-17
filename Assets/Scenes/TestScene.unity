@@ -1409,6 +1409,7 @@ MonoBehaviour:
   maxHealth: 9
   abilities:
   - {fileID: 11400000, guid: e1f6bbcc1da7ba24489fc5aa343f60ed, type: 2}
+  myClass: {fileID: 0}
   moveDistance: 30
   alacrity: 0
   visionRadius: 20
@@ -1453,7 +1454,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 823127914}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -27.91, y: 0.39, z: -13.59}
+  m_LocalPosition: {x: -27.91, y: 0.39, z: -7.51}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2366,10 +2367,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   level: 1
-  health: 9
-  maxHealth: 9
+  health: 14
+  maxHealth: 14
   abilities:
   - {fileID: 11400000, guid: e1f6bbcc1da7ba24489fc5aa343f60ed, type: 2}
+  myClass: {fileID: 11400000, guid: 1f40e8024d98adf43a69ee9acfc8b9b6, type: 2}
   moveDistance: 30
   alacrity: 0
   visionRadius: 20

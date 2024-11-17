@@ -9,7 +9,7 @@ public class Character : MonoBehaviour
     public int health;
     public int maxHealth;
     public List<Ability> abilities = new();
-
+    public CharacterClass myClass;
 
     //STAT BLOCK
     public float moveDistance = 30;

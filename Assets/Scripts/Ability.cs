@@ -32,15 +32,17 @@ public class Ability : ScriptableObject
 
         int toHit = Random.Range(1, 20);
         toHit += statBonus + levelBonus;
-
-        if (toHit >= target.protectionScore)
+        if (target != null)
         {
-            int totalDamage = 0;
-            foreach(DamageRoll roll in damageRolls)
+            if (toHit >= target.protectionScore)
             {
-                totalDamage += roll.Roll();
-                //TODO : Animations
-                target.TakeDamage(totalDamage + statBonus, caster, roll.damageType);
+                int totalDamage = 0;
+                foreach (DamageRoll roll in damageRolls)
+                {
+                    totalDamage += roll.Roll();
+                    //TODO : Animations
+                    target.TakeDamage(totalDamage + statBonus, caster, roll.damageType);
+                }
             }
         }
     }
