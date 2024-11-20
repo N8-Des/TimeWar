@@ -4,9 +4,11 @@ using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using static GlobalEnums;
 
+[System.Serializable]
 [CreateAssetMenu(menuName = "Abilities/StandardAbility")]
 public class Ability : ScriptableObject
 {
+    public bool isPassive = false;
     public string abilityName;
     public string abilityDescription;
     public int cost;
@@ -15,34 +17,24 @@ public class Ability : ScriptableObject
     public Sprite icon;
     public List<DamageRoll> damageRolls = new List<DamageRoll>();
     public ActionType actionType;
-    public Stat scaledStat;
     public float attackRange;
 
     DecalProjector projector;
     LineRenderer abilityLine;
 
+    public bool stunning = false;
+
     //default ability: make attack roll and deal damage to target
     public virtual void Execute(Character caster, Character target, Vector3 targetLocation)
     {
-        //get stat bonuses
-        int statBonus = caster.GetScoreWithEnum(scaledStat);
-        statBonus = Mathf.CeilToInt(((float)statBonus - 10) / 2);
-        int levelBonus = Mathf.FloorToInt((float)caster.level / 2);
-        //TODO : extra to-hit bonuses from equipment and buffs
-
-        int toHit = Random.Range(1, 20);
-        toHit += statBonus + levelBonus;
-        if (target != null)
+        int toHit = Mathf.CeilToInt(caster.power / 2) + Random.Range(1, 20);
+        toHit += toHitModifier;
+        if(toHit >= target.dodge)
         {
-            if (toHit >= target.protectionScore)
+            foreach(DamageRoll dRoll in damageRolls)
             {
-                int totalDamage = 0;
-                foreach (DamageRoll roll in damageRolls)
-                {
-                    totalDamage += roll.Roll();
-                    //TODO : Animations
-                    target.TakeDamage(totalDamage + statBonus, caster, roll.damageType);
-                }
+                int damage = dRoll.Roll();
+                target.TakeDamage(damage, caster, dRoll.damageType);
             }
         }
     }
@@ -72,7 +64,7 @@ public class Ability : ScriptableObject
 
 
         abilityLine.SetPosition(0, startPosition + Vector3.up);
-        abilityLine.SetPosition(1, mousePosition);
+        abilityLine.SetPosition(1, mousePosition + Vector3.up);
     }
 
     public virtual bool IsValidSpell(Vector3 start, Vector3 direction, Character target)

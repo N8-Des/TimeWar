@@ -21,12 +21,15 @@ public class BattleManager : MonoBehaviour
     public int currentTurn;
     public int currentRound;
 
+    public Transform allyStartPosition;
+
 
     Character currentCharacter;
     AllyCharacterMovement characterMovement;
 
     private void Start()
     {
+        FindObjectOfType<CharacterSaveLoadManager>().LoadDataIntoBattle(allyStartPosition.position, this);
         StartBattle();
     }
 

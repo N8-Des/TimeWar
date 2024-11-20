@@ -12,13 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d884e04a02e50334d9aaa72e0384866b, type: 3}
   m_Name: Knight
   m_EditorClassIdentifier: 
-  strength: 16
-  dexterity: 10
+  power: 15
+  fortitude: 15
+  mind: 8
   maxHealth: 14
-  mind: 10
-  endurance: 15
-  resolve: 12
   moveDistance: 22
   alacrity: -1
   visionRadius: 20
-  protectionScore: 17
+  protectionScore: 20
+  dodgeScore: 16
+  defaultAbilities:
+  - {fileID: 11400000, guid: cb3f38f28cab26747ba76dda294328f1, type: 2}
