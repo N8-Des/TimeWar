@@ -6,35 +6,31 @@ using static GlobalEnums;
 [System.Serializable]
 public class Character : MonoBehaviour
 {
-    public int level;
     public int health;
-    public int maxHealth;
-    public List<Ability> abilities = new();
+    public float currentMoveDistance;
+
+    public CharacterStats stats;
     public CharacterClass myClass;
     public List <DamageType> resistedTypes = new List<DamageType>();
     public List<DamageType> immuneTypes = new List<DamageType>();
+    public AbilityManager abilityManager;
 
 
 
-    //STAT BLOCK
-    public float moveDistance = 30;
-    public int alacrity = 0;
-    public float visionRadius = 20;
-    public float currentMoveDistance;
-
-    public int power = 10;
-    public int fortitude = 10;
-    public int mind = 10;
-    
-
-    public float dodge = 10;
-    public float protection = 0;
     public bool isAlly = true;
-
 
     int turnsStunned = 0;
 
 
+    private void Awake()
+    {
+        abilityManager = GetComponent<AbilityManager>();
+    }
+
+    public void SetStats(CharacterStats stats)
+    {
+        this.stats = stats;
+    }
 
     public void TakeDamage(int damage, Character source, DamageType damageType)
     {
@@ -61,7 +57,7 @@ public class Character : MonoBehaviour
 
     public void StartRound()
     {
-        currentMoveDistance = moveDistance;
+        currentMoveDistance = stats.Movement.GetValue();
     }
 
     

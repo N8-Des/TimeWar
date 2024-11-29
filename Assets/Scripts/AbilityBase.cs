@@ -1,37 +1,30 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering.Universal;
 using static GlobalEnums;
+using UnityEngine.Rendering.Universal;
 
-[System.Serializable]
-[CreateAssetMenu(menuName = "Abilities/StandardAbility")]
-public class Ability : ScriptableObject
+public class AbilityBase : MonoBehaviour
 {
-    public bool isPassive = false;
-    public string abilityName;
-    public string abilityDescription;
-    public int cost;
-    public int toHitModifier;
-    public int damageModifier;
-    public Sprite icon;
-    public List<DamageRoll> damageRolls = new List<DamageRoll>();
-    public ActionType actionType;
-    public float attackRange;
+
+    public AbilityConfig config;
 
     DecalProjector projector;
     LineRenderer abilityLine;
+    public AbilityBase(AbilityConfig config)
+    {
+        this.config = config;
+    }
+    public AbilityBase()
+    { }
 
-    public bool stunning = false;
-
-    //default ability: make attack roll and deal damage to target
     public virtual void Execute(Character caster, Character target, Vector3 targetLocation)
     {
-        int toHit = Mathf.CeilToInt(caster.power / 2) + Random.Range(1, 20);
-        toHit += toHitModifier;
-        if(toHit >= target.dodge)
+        int toHit = Mathf.CeilToInt(caster.stats.Power.GetValue() / 2) + Random.Range(1, 20);
+        toHit += config.toHitModifier;
+        if (toHit >= target.stats.Dodge.GetValue())
         {
-            foreach(DamageRoll dRoll in damageRolls)
+            foreach (DamageRoll dRoll in config.damageRolls)
             {
                 int damage = dRoll.Roll();
                 target.TakeDamage(damage, caster, dRoll.damageType);
@@ -41,7 +34,7 @@ public class Ability : ScriptableObject
 
     public virtual void DisplaySpell(Vector3 startPosition, Vector3 mousePosition, Character caster)
     {
-        if (abilityLine == null) 
+        if (abilityLine == null)
         {
             GameObject lineObject = new GameObject();
             abilityLine = lineObject.AddComponent<LineRenderer>();
@@ -58,8 +51,8 @@ public class Ability : ScriptableObject
             projectorObject.transform.position = caster.transform.position + (Vector3.up * 10);
             projectorObject.transform.rotation = Quaternion.Euler(90, 0, 0);
             projector.material = FindObjectOfType<BattleManager>().radiusMat;
-            projector.size = new(attackRange * 2, attackRange * 2, 30);
-            
+            projector.size = new(config.attackRange * 2, config.attackRange * 2, 30);
+
         }
 
 
@@ -73,9 +66,9 @@ public class Ability : ScriptableObject
         {
             return false;
         }
-        else if (attackRange > 5)
+        else if (config.attackRange > 5)
         {
-            if (Physics.Raycast(start, direction, attackRange, FindObjectOfType<BattleManager>().groundLayerMask))
+            if (Physics.Raycast(start, direction, config.attackRange, FindObjectOfType<BattleManager>().groundLayerMask))
             {
                 return false;
             }

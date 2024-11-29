@@ -19,7 +19,7 @@ MonoBehaviour:
   moveDistance: 22
   alacrity: -1
   visionRadius: 20
-  protectionScore: 20
   dodgeScore: 16
+  willpowerScore: 10
   defaultAbilities:
-  - {fileID: 11400000, guid: cb3f38f28cab26747ba76dda294328f1, type: 2}
+  - {fileID: 11400000, guid: 30ba902299d068e43ad1bba84ad6131d, type: 2}

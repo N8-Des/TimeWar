@@ -1307,23 +1307,56 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 660388b64f688084e8432cd2b21f4e04, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  level: 1
   health: 9
-  maxHealth: 9
-  abilities:
-  - {fileID: 11400000, guid: e1f6bbcc1da7ba24489fc5aa343f60ed, type: 2}
+  currentMoveDistance: 0
+  stats:
+    Health:
+      baseValue: 0
+      modifiers: []
+      name: 
+    Power:
+      baseValue: 0
+      modifiers: []
+      name: 
+    Fortitude:
+      baseValue: 0
+      modifiers: []
+      name: 
+    Mind:
+      baseValue: 0
+      modifiers: []
+      name: 
+    Movement:
+      baseValue: 0
+      modifiers: []
+      name: 
+    Alacrity:
+      baseValue: 0
+      modifiers: []
+      name: 
+    Vision:
+      baseValue: 0
+      modifiers: []
+      name: 
+    Protection:
+      baseValue: 0
+      modifiers: []
+      name: 
+    Dodge:
+      baseValue: 0
+      modifiers: []
+      name: 
+    Willpower:
+      baseValue: 0
+      modifiers: []
+      name: 
+    level: 1
+    classIndex: 0
+    abilityIndices: 
   myClass: {fileID: 0}
   resistedTypes: 
   immuneTypes: 
-  moveDistance: 30
-  alacrity: 0
-  visionRadius: 20
-  currentMoveDistance: 0
-  power: 10
-  fortitude: 10
-  mind: 10
-  dodge: 10
-  protection: 0
+  abilityManager: {fileID: 0}
   isAlly: 0
 --- !u!195 &823127917
 NavMeshAgent:
@@ -3352,6 +3385,10 @@ PrefabInstance:
     - target: {fileID: 937905424082554032, guid: 13daef7ce03458c4ca1ff6a0098fc962, type: 3}
       propertyPath: m_Name
       value: AllyCharacterDefault
+      objectReference: {fileID: 0}
+    - target: {fileID: 937905424082554032, guid: 13daef7ce03458c4ca1ff6a0098fc962, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 937905424082554039, guid: 13daef7ce03458c4ca1ff6a0098fc962, type: 3}
       propertyPath: m_RootOrder

@@ -7,21 +7,23 @@ using UnityEngine;
 public class CharacterSaveLoadManager : MonoBehaviour
 {
     public GameObject defaultPlayerPrefab;
+    GlobalValues globalValues;
+
     [System.Serializable]
     public class CharacterBattleData 
     {
-        public List<Character> characterList;
+        public List<CharacterStats> characterList;
     }
 
     private void Awake()
     {
         DontDestroyOnLoad(this);
+        globalValues = GetComponent<GlobalValues>();
     }
-    public void SaveCharacterData(List<Character> characters)
+    public void SaveCharacterData(List<CharacterStats> characters)
     {
         CharacterBattleData characterBattleData = new CharacterBattleData();
         characterBattleData.characterList = characters;
-        print(characterBattleData.characterList.Count);
         string json = JsonUtility.ToJson(characterBattleData);
         string path = Path.Combine(Application.persistentDataPath, "characterBattleData.json");
 
@@ -36,15 +38,27 @@ public class CharacterSaveLoadManager : MonoBehaviour
         {
             string json = File.ReadAllText(path);
             CharacterBattleData characters = JsonUtility.FromJson<CharacterBattleData>(json);
-            print(json);
-            battleManager.characters = characters.characterList;
-            foreach(Character character in characters.characterList)
+            battleManager.characters.Clear();
+            foreach (CharacterStats stats in characters.characterList)
             {
+                //spawn character gameobject
                 GameObject go = GameObject.Instantiate(defaultPlayerPrefab);
                 go.transform.position = startPosition + new Vector3(Random.Range(-5, 5), 0, Random.Range(-5, 5));
                 Character defaultCharacter = go.GetComponent<Character>();
-                defaultCharacter = character;
+                defaultCharacter.SetStats(stats);
+                battleManager.characters.Add(defaultCharacter);
+
+
+                //setup abilities
+                List<AbilityConfig> abilities = new List<AbilityConfig>();
+                foreach (int index in stats.abilityIndices)
+                {
+                    abilities.Add(globalValues.abilities[index]);
+                }
+                defaultCharacter.GetComponent<AbilityManager>().InitializeAbilities(abilities);
             }
         }
+
+        battleManager.StartBattle();
     }
 }

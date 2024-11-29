@@ -30,7 +30,6 @@ public class BattleManager : MonoBehaviour
     private void Start()
     {
         FindObjectOfType<CharacterSaveLoadManager>().LoadDataIntoBattle(allyStartPosition.position, this);
-        StartBattle();
     }
 
     public void StartBattle()
@@ -38,13 +37,13 @@ public class BattleManager : MonoBehaviour
         initiative.Clear();
         foreach (Character character in characters)
         {
-            int alacrity = Random.Range(1, 20) + character.alacrity;
+            int alacrity = Random.Range(1, 20) + (int)character.stats.Alacrity.GetValue();
             (Character, int) initiativeTuple = (character, alacrity);
             initiative.Add(initiativeTuple);
         }
         initiative.Sort((x, y) => y.Item2.CompareTo(x.Item2));
         currentRound = 1;
-        currentTurn = -1;
+        currentTurn = 0;
         NextTurn();
     }
 
@@ -63,16 +62,19 @@ public class BattleManager : MonoBehaviour
 
     public void SetCurrentCharacter(Character character)
     {
+        
         currentCharacter = character;
         characterMovement = character.GetComponent<AllyCharacterMovement>();
-        for (int i = 0; i < character.abilities.Count; i++)
+        for (int i = 0; i < character.abilityManager.abilities.Count; i++)
         {
-            abilityDisplay.abilityButtons[i].SetAbility(character.abilities[i], character);
+            abilityDisplay.abilityButtons[i].SetAbility(character.abilityManager.abilities[i].config, character);
         }
-        for (int i = abilityDisplay.abilityButtons.Count - 1; i >= character.abilities.Count; i--)
+        for (int i = abilityDisplay.abilityButtons.Count - 1; i >= character.abilityManager.abilities.Count; i--)
         {
             abilityDisplay.abilityButtons[i].enabled = false;
         }
         currentCharacter.StartRound();
+        characterMovement.StartTurn();
+        
     }
 }

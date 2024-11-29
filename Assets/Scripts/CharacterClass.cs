@@ -18,9 +18,8 @@ public class CharacterClass : ScriptableObject
     public int alacrity = 0;
     public float visionRadius = 20;
 
-    public int protectionScore = 10;
     public int dodgeScore = 10;
-
-
-    public List<Ability> defaultAbilities = new();
+    public int willpowerScore = 10; 
+    
+    public List<AbilityConfig> defaultAbilities = new();
 }

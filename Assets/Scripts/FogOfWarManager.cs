@@ -77,7 +77,7 @@ public class FogOfWarManager : MonoBehaviour
                 for(int j = 0; j < nodesAtPosition.Count; j++)
                 {
                     GridNode node = nodesAtPosition[j];
-                    if (Vector3.Distance(allyPosition, node.position) > ally.visionRadius + cellSize * 2)
+                    if (Vector3.Distance(allyPosition, node.position) > ally.stats.Vision.GetValue() + cellSize * 2)
                         continue;
 
                     RaycastHit hit;
@@ -87,7 +87,7 @@ public class FogOfWarManager : MonoBehaviour
                     }
                     else
                     {
-                        if (Vector3.Distance(allyPosition, node.position) < ally.visionRadius)
+                        if (Vector3.Distance(allyPosition, node.position) < ally.stats.Vision.GetValue())
                         {
                             node.playerVisibility[i] = true;
                         }

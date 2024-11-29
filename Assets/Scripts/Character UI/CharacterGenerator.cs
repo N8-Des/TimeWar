@@ -6,14 +6,15 @@ using UnityEngine.SceneManagement;
 
 public class CharacterGenerator : MonoBehaviour
 {
-    public List<Character> characters = new List<Character>();
-    public List <CharacterClass> classes = new List<CharacterClass>();
+    public List<CharacterStats> characterStats = new List<CharacterStats>();
     public List<StatBlock> statBlocks = new List<StatBlock>();
+    GlobalValues globalValues;
 
     private void Start()
     {
+        globalValues = FindObjectOfType<GlobalValues>();
         GenerateCharacters();
-        FindObjectOfType<CharacterSaveLoadManager>().SaveCharacterData(characters);
+        FindObjectOfType<CharacterSaveLoadManager>().SaveCharacterData(characterStats);
         SceneManager.LoadScene("TestScene");
     }
 
@@ -21,25 +22,49 @@ public class CharacterGenerator : MonoBehaviour
     {
         for(int i = 0; i < 4; i++)
         {
-            Character newChar = new Character();
-            newChar.myClass = classes[0];
-            GenerateStats(newChar);
+            CharacterStats cStats = new()
+            {
+                classIndex = 0
+            };
+            GenerateStats(cStats);
 
-            statBlocks[i].SetStatDisplay(newChar);
-            characters.Add(newChar);
+            statBlocks[i].SetStatDisplay(cStats);
+            characterStats.Add(cStats);
         }
     }
 
 
-    void GenerateStats(Character c)
+    void GenerateStats(CharacterStats c)
     {
-        c.maxHealth = c.myClass.maxHealth + Random.Range(-2, 3);
-        c.power = c.myClass.power + Random.Range(-2, 3);
-        c.fortitude = c.myClass.fortitude + Random.Range(-2, 3);
-        c.mind = c.myClass.mind + Random.Range(-2, 3);
-        c.protection = c.myClass.protectionScore;
-        c.moveDistance = c.myClass.moveDistance;
-        c.alacrity = c.myClass.alacrity;
-        c.dodge = c.myClass.dodgeScore;
+        CharacterClass cClass = globalValues.classes[c.classIndex];
+
+        c.Health.baseValue = cClass.maxHealth + Random.Range(-2, 3);
+        c.Power.baseValue = cClass.power + Random.Range(-2, 3);
+        c.Fortitude.baseValue = cClass.fortitude + Random.Range(-2, 3);
+        c.Mind.baseValue = cClass.mind + Random.Range(-2, 3);
+        c.Movement.baseValue = cClass.moveDistance;
+        c.Alacrity.baseValue = cClass.alacrity;
+        c.Dodge.baseValue = cClass.dodgeScore;
+
+
+        //ability lookup
+        //this system sucks but it works at the scale I have
+        foreach (AbilityConfig abilityConfig in cClass.defaultAbilities)
+        {
+            int index = -1;
+            for (int i = 0; i < globalValues.abilities.Count; i++)
+            {
+                if (globalValues.abilities[i].name == abilityConfig.name) 
+                {
+                    index = i;
+                    break;
+                }
+            }
+            if (index != -1)
+            {
+                c.abilityIndices.Add(index);
+            }
+        }
+
     }
 }

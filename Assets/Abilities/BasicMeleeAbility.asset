@@ -9,12 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 07cced35b3a500947b365404b1b391bf, type: 3}
-  m_Name: BasicMeleeAttack
+  m_Script: {fileID: 11500000, guid: 9324fc9c685995d41839d6960595f46d, type: 3}
+  m_Name: BasicMeleeAbility
   m_EditorClassIdentifier: 
   isPassive: 0
   abilityName: Slash
-  abilityDescription: Slash at enemy
+  abilityDescription: Slash with your sword at the target
   cost: 0
   toHitModifier: 1
   damageModifier: 1
@@ -22,3 +22,4 @@ MonoBehaviour:
   actionType: 1
   attackRange: 5
   stunning: 0
+  abilityType: {fileID: 11500000, guid: 92e68d0b893a9964a89d58cf4b7c85d1, type: 3}

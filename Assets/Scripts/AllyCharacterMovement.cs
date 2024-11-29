@@ -24,13 +24,12 @@ public class AllyCharacterMovement : MonoBehaviour
     NavMeshAgent myAgent;
     Character myCharacter;
 
-
     //abilities
     bool inAbilitySelect = false;
     Character targetCharacter;
     Vector3 abilityTargetPosition;
     public int selectedAbilityIndex;
-    Ability selectedAbility;
+    AbilityBase selectedAbility;
     bool validAbility;
     bool needMovementForAbility = false;
 
@@ -39,16 +38,15 @@ public class AllyCharacterMovement : MonoBehaviour
     bool isMoving = false;
     bool hasValidPath = false;
     float currentPathDistance;
+    bool isMyTurn = false;
 
-
-    private void Start()
+    private void Awake()
     {
         myAgent = GetComponent<NavMeshAgent>();
         myCharacter = GetComponent<Character>();
 
         //get values from Battle Manager
         battleManager = FindObjectOfType<BattleManager>();
-
         //create line (should probably just turn this into a prefab)
         GameObject pathObject = Resources.Load<GameObject>("PathLineRenderer");
         pathObject = Instantiate(pathObject);
@@ -70,6 +68,22 @@ public class AllyCharacterMovement : MonoBehaviour
     }
 
 
+    public void StartTurn()
+    {
+        isMyTurn = true;
+        pathRenderer.pathDisplay.enabled = true;
+        pathRenderer.extraPathDisplay.enabled = true;
+        selectedAbility = null;
+    }
+
+    public void EndTurn()
+    {
+        isMyTurn = false;
+        pathRenderer.pathDisplay.enabled = false;
+        pathRenderer.extraPathDisplay.enabled = false;
+    }
+
+
     public void StartAbilitySelection(int index)
     {
         selectedAbilityIndex = index;
@@ -77,7 +91,7 @@ public class AllyCharacterMovement : MonoBehaviour
         pathRenderer.pathDisplay.enabled = false;
         pathRenderer.extraPathDisplay.enabled = false;
         targetCharacter = null;
-        selectedAbility = myCharacter.abilities[selectedAbilityIndex];
+        selectedAbility = myCharacter.abilityManager.abilities[selectedAbilityIndex];
     }
 
     public void EndAbilitySelection()
@@ -103,48 +117,51 @@ public class AllyCharacterMovement : MonoBehaviour
 
     void Update()
     {
-        if (isMoving)
+        if (isMyTurn)
         {
-            FollowPath();
-        }
-        else
-        {
-            if (!inAbilitySelect)
+            if (isMoving)
             {
-                GetPath();
-                if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
-                {
-                    ClickPosition();
-                }
+                FollowPath();
             }
             else
             {
-                DisplayAbility();
-
-                if (Input.GetMouseButtonDown(0))
+                if (!inAbilitySelect)
                 {
-                    if (validAbility)
+                    GetPath();
+                    if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
                     {
-                        if (needMovementForAbility)
+                        ClickPosition();
+                    }
+                }
+                else
+                {
+                    DisplayAbility();
+
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        if (validAbility)
                         {
-                            ClickPosition();
-                            selectedAbility.EndDisplay();
+                            if (needMovementForAbility)
+                            {
+                                ClickPosition();
+                                selectedAbility.EndDisplay();
+                            }
+                            else
+                            {
+                                selectedAbility.Execute(myCharacter, targetCharacter, abilityTargetPosition);
+                                EndAbilitySelection();
+                            }
                         }
-                        else
-                        {
-                            selectedAbility.Execute(myCharacter, targetCharacter, abilityTargetPosition);
-                            EndAbilitySelection();
-                        }
+                    }
+
+                    if (Input.GetMouseButtonDown(1))
+                    {
+                        EndAbilitySelection();
+                        selectedAbility.EndDisplay();
                     }
                 }
 
-                if (Input.GetMouseButtonDown(1))
-                {
-                    EndAbilitySelection();
-                    selectedAbility.EndDisplay();
-                }
             }
-          
         }
     }
 
@@ -162,9 +179,9 @@ public class AllyCharacterMovement : MonoBehaviour
                 targetCharacter = hit.transform.gameObject.GetComponentInParent<Character>();
             }
         }
-        if (Vector3.Distance(abilityTargetPosition, transform.position) >= selectedAbility.attackRange)
+        if (Vector3.Distance(abilityTargetPosition, transform.position) >= selectedAbility.config.attackRange)
         {
-            Vector3 targetPosition = GetMaxAbilityDistance(transform.position, abilityTargetPosition, selectedAbility.attackRange);
+            Vector3 targetPosition = GetMaxAbilityDistance(transform.position, abilityTargetPosition, selectedAbility.config.attackRange);
             NavMesh.CalculatePath(transform.position, targetPosition, NavMesh.AllAreas, path);
 
 

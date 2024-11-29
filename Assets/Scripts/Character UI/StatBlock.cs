@@ -16,14 +16,14 @@ public class StatBlock : MonoBehaviour
     public TextMeshProUGUI dodge;
 
 
-    public void SetStatDisplay(Character c)
+    public void SetStatDisplay(CharacterStats c)
     {
-        power.text = "Power: " + c.power;
-        fortitude.text = "Fortitude: " + c.fortitude;
-        mind.text = "Mind: " + c.mind;
-        moveSpeed.text = "Movement: " + c.moveDistance;
-        alacrity.text = "Alacrity: " + c.alacrity;
-        protection.text = "Protection: " + c.protection;
-        dodge.text = "Dodge: " + c.dodge;
+        power.text = "Power: " + c.Power.GetValue();
+        fortitude.text = "Fortitude: " + c.Fortitude.GetValue();
+        mind.text = "Mind: " + c.Mind.GetValue();
+        moveSpeed.text = "Movement: " + c.Movement.GetValue();
+        alacrity.text = "Alacrity: " + c.Alacrity.GetValue();
+        protection.text = "Protection: " + c.Protection.GetValue();
+        dodge.text = "Dodge: " + c.Dodge.GetValue();
     }
 }

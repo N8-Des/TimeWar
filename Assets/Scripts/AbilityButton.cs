@@ -6,7 +6,7 @@ using UnityEngine;
 public class AbilityButton : MonoBehaviour
 {
     public TextMeshProUGUI abilityName;
-    public Ability ability;
+    public AbilityConfig ability;
     public Character character;
     BattleManager battleManager;
     public int buttonIndex;
@@ -16,7 +16,7 @@ public class AbilityButton : MonoBehaviour
         battleManager = FindObjectOfType<BattleManager>();
     }
 
-    public void SetAbility(Ability a, Character c)
+    public void SetAbility(AbilityConfig a, Character c)
     {
         abilityName.text = a.name;
         ability = a;

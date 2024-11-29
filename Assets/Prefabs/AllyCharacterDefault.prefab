@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 937905424082554038}
   - component: {fileID: 937905424082554033}
   - component: {fileID: 937905424082554036}
+  - component: {fileID: 8581871010905870569}
   m_Layer: 7
   m_Name: AllyCharacterDefault
   m_TagString: Untagged
@@ -83,24 +84,67 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 660388b64f688084e8432cd2b21f4e04, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  level: 1
   health: 14
-  maxHealth: 14
-  abilities:
-  - {fileID: 11400000, guid: cb3f38f28cab26747ba76dda294328f1, type: 2}
+  currentMoveDistance: 0
+  stats:
+    Health:
+      baseValue: 0
+      modifiers: []
+      name: 
+    Power:
+      baseValue: 0
+      modifiers: []
+      name: 
+    Fortitude:
+      baseValue: 0
+      modifiers: []
+      name: 
+    Mind:
+      baseValue: 0
+      modifiers: []
+      name: 
+    Movement:
+      baseValue: 0
+      modifiers: []
+      name: 
+    Alacrity:
+      baseValue: 0
+      modifiers: []
+      name: 
+    Vision:
+      baseValue: 0
+      modifiers: []
+      name: 
+    Protection:
+      baseValue: 0
+      modifiers: []
+      name: 
+    Dodge:
+      baseValue: 0
+      modifiers: []
+      name: 
+    Willpower:
+      baseValue: 0
+      modifiers: []
+      name: 
+    level: 1
+    classIndex: 0
   myClass: {fileID: 11400000, guid: 1f40e8024d98adf43a69ee9acfc8b9b6, type: 2}
   resistedTypes: 
   immuneTypes: 
-  moveDistance: 30
-  alacrity: 0
-  visionRadius: 20
-  currentMoveDistance: 0
-  power: 10
-  fortitude: 10
-  mind: 10
-  dodge: 10
-  protection: 0
   isAlly: 1
+--- !u!114 &8581871010905870569
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 937905424082554032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c164c8fe94b397429d78da346cdf848, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &937905424934003500
 GameObject:
   m_ObjectHideFlags: 0

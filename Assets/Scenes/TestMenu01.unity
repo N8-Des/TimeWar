@@ -1667,9 +1667,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c091415d0b0f0304793d965eb7afde9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characters: []
-  classes:
-  - {fileID: 11400000, guid: 1f40e8024d98adf43a69ee9acfc8b9b6, type: 2}
+  characterStats: []
   statBlocks:
   - {fileID: 987402710}
   - {fileID: 580808925}
@@ -5442,8 +5440,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1856041628}
   - component: {fileID: 1856041627}
+  - component: {fileID: 1856041629}
   m_Layer: 0
-  m_Name: CharacterBattleData
+  m_Name: Persistent Data
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5477,6 +5476,23 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1856041629
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1856041626}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e5cad85c32d1ce43910f7a9bc1f59cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  classes:
+  - {fileID: 11400000, guid: 1f40e8024d98adf43a69ee9acfc8b9b6, type: 2}
+  abilities:
+  - {fileID: 11400000, guid: 30ba902299d068e43ad1bba84ad6131d, type: 2}
+  - {fileID: 11400000, guid: 91460b0f8fb8b5845a43f2fba6252f04, type: 2}
 --- !u!1 &1943614179
 GameObject:
   m_ObjectHideFlags: 0
