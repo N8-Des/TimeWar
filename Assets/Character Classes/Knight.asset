@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d884e04a02e50334d9aaa72e0384866b, type: 3}
   m_Name: Knight
   m_EditorClassIdentifier: 
+  className: Knight
   power: 15
   fortitude: 15
   mind: 8

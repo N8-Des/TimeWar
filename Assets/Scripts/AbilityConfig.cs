@@ -10,7 +10,13 @@ using static GlobalEnums;
 [CreateAssetMenu(menuName = "Abilities/StandardAbility")]
 public class AbilityConfig : ScriptableObject
 {
+
+    [Header("General Settings")]
     public bool isPassive = false;
+    public bool stunning = false;
+
+
+    [Header("Stats")]
     public string abilityName;
     public string abilityDescription;
     public int cost;
@@ -20,9 +26,11 @@ public class AbilityConfig : ScriptableObject
     public List<DamageRoll> damageRolls = new List<DamageRoll>();
     public ActionType actionType;
     public float attackRange;
-    public bool stunning = false;
     public MonoScript abilityType;
-   
+
+    [Header("Augments")]
+    public bool isAugment;
+    public AbilityConfig augmentedAbility;
 
 
     public Type GetAbilityType()

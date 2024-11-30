@@ -55,14 +55,6 @@ public class AllyCharacterMovement : MonoBehaviour
         pathObject.transform.eulerAngles = new(90, 0, 0);
         pathRenderer = pathObject.GetComponent<PlayerPathRenderer>();
 
-
-        //create line end indicator
-        /*positionIndicator = Resources.Load<GameObject>("RadiusSelector");
-        positionIndicator = Instantiate(positionIndicator);
-        positionIndicator.GetComponentInChildren<MeshRenderer>().material.color = new Color32(0, 163, 255, 255);
-        positionIndicator.transform.localScale = Vector3.one * 1.5f;
-        */
-
         //make nav mesh path
         path = new NavMeshPath();
     }

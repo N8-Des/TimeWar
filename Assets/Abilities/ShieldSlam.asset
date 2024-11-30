@@ -10,16 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9324fc9c685995d41839d6960595f46d, type: 3}
-  m_Name: BasicMeleeAbility
+  m_Name: ShieldSlam
   m_EditorClassIdentifier: 
   isPassive: 0
-  abilityName: Slash
-  abilityDescription: Slash with your sword at the target
+  abilityName: Shield Slam
+  abilityDescription: Slam your shield, possibly stunning an enemy
   cost: 0
   toHitModifier: 1
   damageModifier: 0
   icon: {fileID: 0}
   actionType: 1
   attackRange: 3
-  stunning: 1
+  stunning: 0
   abilityType: {fileID: 11500000, guid: 92e68d0b893a9964a89d58cf4b7c85d1, type: 3}

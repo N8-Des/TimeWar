@@ -66,7 +66,7 @@ public class AbilityBase : MonoBehaviour
         {
             return false;
         }
-        else if (config.attackRange > 5)
+        else if (config.attackRange > 3)
         {
             if (Physics.Raycast(start, direction, config.attackRange, FindObjectOfType<BattleManager>().groundLayerMask))
             {

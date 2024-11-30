@@ -65,6 +65,5 @@ public class CharacterGenerator : MonoBehaviour
                 c.abilityIndices.Add(index);
             }
         }
-
     }
 }

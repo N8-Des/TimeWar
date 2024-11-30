@@ -89,4 +89,19 @@ public class GlobalEnums : MonoBehaviour
         Primary,
         Secondary
     }
+
+    public enum StatType
+    { 
+        Health,
+        Power,
+        Fortitude, 
+        Mind,
+        Movement,
+        Alacrity,
+        Vision,
+        Protection,
+        Dodge,
+        Willpower
+    }
+
 }

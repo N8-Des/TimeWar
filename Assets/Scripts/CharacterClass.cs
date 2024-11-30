@@ -8,6 +8,7 @@ using UnityEngine;
 [System.Serializable]
 public class CharacterClass : ScriptableObject
 {
+    public string className;
     //BASE STATS
     public int power = 10;
     public int fortitude = 10;

@@ -6,20 +6,22 @@ using static GlobalEnums;
 [System.Serializable]
 public class CharacterStats
 {
-    public Stat Health = new Stat(0);
-    public Stat Power = new Stat(0);
-    public Stat Fortitude = new Stat(0);
-    public Stat Mind = new Stat(0);
-    public Stat Movement = new Stat(0);
-    public Stat Alacrity = new Stat(0);
-    public Stat Vision = new Stat(0);
-    public Stat Protection = new Stat(0);
-    public Stat Dodge = new Stat(0);
-    public Stat Willpower = new Stat(0);
-
+    [Header("Stats")]
+    public Stat Health = new(0);
+    public Stat Power = new(0);
+    public Stat Fortitude = new(0);
+    public Stat Mind = new(0);
+    public Stat Movement = new(0);
+    public Stat Alacrity = new(0);
+    public Stat Vision = new(0);
+    public Stat Protection = new(0);
+    public Stat Dodge = new(0);
+    public Stat Willpower = new(0);
     public int level = 1;
-
     public int classIndex;
 
+    [Header("Abilities")]
+    public int availableUpgradePoints = 0;
+    public int usedUpgradePoints = 0;
     public List<int> abilityIndices = new();
 }
