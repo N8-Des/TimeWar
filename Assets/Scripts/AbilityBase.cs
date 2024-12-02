@@ -9,8 +9,10 @@ public class AbilityBase : MonoBehaviour
 
     public AbilityConfig config;
 
-    DecalProjector projector;
-    LineRenderer abilityLine;
+    protected DecalProjector projector;
+    protected LineRenderer abilityLine;
+    protected Character character;
+
     public AbilityBase(AbilityConfig config)
     {
         this.config = config;
@@ -20,14 +22,25 @@ public class AbilityBase : MonoBehaviour
 
     public virtual void Execute(Character caster, Character target, Vector3 targetLocation)
     {
-        int toHit = Mathf.CeilToInt(caster.stats.Power.GetValue() / 2) + Random.Range(1, 20);
+        int toHit = Mathf.CeilToInt(config.toHitFormula.GetScaledValue(character.stats) + Random.Range(1, 20));
         toHit += config.toHitModifier;
-        if (toHit >= target.stats.Dodge.GetValue())
+        if (toHit >= target.stats.Protection.GetValue())
         {
             foreach (DamageRoll dRoll in config.damageRolls)
             {
                 int damage = dRoll.Roll();
                 target.TakeDamage(damage, caster, dRoll.damageType);
+            }
+            int scaledDamage = Mathf.CeilToInt(config.damageFormula.GetScaledValue(character.stats));
+            target.TakeDamage(scaledDamage, caster, config.damageType);
+        }
+
+        if (config.isStunning)
+        {
+            int toStun = Mathf.CeilToInt(config.saveFormula.GetScaledValue(character.stats)) + Random.Range(1, 20);
+            if (toStun >= target.stats.Fortitude.GetValue())
+            {
+                target.TakeStun(config.stunDuration);
             }
         }
     }
@@ -58,6 +71,10 @@ public class AbilityBase : MonoBehaviour
 
         abilityLine.SetPosition(0, startPosition + Vector3.up);
         abilityLine.SetPosition(1, mousePosition + Vector3.up);
+    }
+    public virtual void Initialize(Character c)
+    {
+        character = c;
     }
 
     public virtual bool IsValidSpell(Vector3 start, Vector3 direction, Character target)

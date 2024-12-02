@@ -129,9 +129,13 @@ MonoBehaviour:
       name: 
     level: 1
     classIndex: 0
+    availableUpgradePoints: 0
+    usedUpgradePoints: 0
+    abilityIndices: 
   myClass: {fileID: 11400000, guid: 1f40e8024d98adf43a69ee9acfc8b9b6, type: 2}
   resistedTypes: 
   immuneTypes: 
+  abilityManager: {fileID: 0}
   isAlly: 1
 --- !u!114 &8581871010905870569
 MonoBehaviour:
@@ -145,6 +149,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c164c8fe94b397429d78da346cdf848, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  abilities: []
+  passives: []
+  character: {fileID: 937905424082554036}
 --- !u!1 &937905424934003500
 GameObject:
   m_ObjectHideFlags: 0

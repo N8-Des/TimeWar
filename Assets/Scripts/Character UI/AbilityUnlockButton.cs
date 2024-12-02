@@ -11,6 +11,8 @@ public class AbilityUnlockButton : MonoBehaviour
     public Image abilityIcon;
     int abilityTier;
     bool isSelected = false;
+    public Sprite unlockedAbilityIcon;
+    public Sprite augmentedAbilityIcon;
 
     public void Create(AbilityUnlock ability, UpgradeTree tree, int tier)
     {
@@ -23,15 +25,20 @@ public class AbilityUnlockButton : MonoBehaviour
         }
     }
 
-    private void Update()
-    {
-        
-    }
-
     public void OnClick()
     {
-        myTree.SelectAbility(this);
+        myTree.SelectAbility(upgrade);
         isSelected = true;
+    }
+
+    public void SetAsUpgraded()
+    {
+        GetComponent<Image>().sprite = unlockedAbilityIcon;
+    }
+
+    public void SetAsAugmented()
+    {
+        GetComponent<Image>().sprite = augmentedAbilityIcon;
     }
 
     public void SetSelected(bool selected)

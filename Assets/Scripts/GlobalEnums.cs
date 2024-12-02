@@ -6,10 +6,11 @@ using UnityEngine;
 public class GlobalEnums : MonoBehaviour
 {
 
-    public class DamageRoll
+    [System.Serializable]
+    public struct DamageRoll
     {
-        int numDice;
-        int diceValue;
+        public int numDice;
+        public int diceValue;
         public DamageType damageType;
 
         public int Roll()
@@ -23,15 +24,43 @@ public class GlobalEnums : MonoBehaviour
         }
     }
 
+
+    [System.Serializable]
+    public struct StatScaling
+    { 
+        public StatType statType;
+        public float multiplier;
+        public float offset;
+        public ScalingFormula formula;
+
+        public float GetScaledValue(CharacterStats cStats)
+        {
+            float scaledStat = cStats.GetStatFromEnum(statType);
+            switch (formula)
+            {
+                case ScalingFormula.Standard:
+                    return (scaledStat + offset) * multiplier;
+                case ScalingFormula.Multiplication:
+                    return scaledStat * multiplier;
+                default: 
+                    return scaledStat;            
+            }
+        }
+    }
+
     [System.Serializable]
     public class Stat
     {
         public float baseValue;
         public List<Modifier> modifiers = new List<Modifier>();
         public string name;
+        public StatType statType;
 
-
-        public Stat(float m_baseValue) => baseValue = m_baseValue;
+        public Stat(float value, StatType type)
+        {
+            baseValue = value;
+            this.statType = type;
+        }
 
         public void AddModifier(Modifier mod)
         {
@@ -73,7 +102,6 @@ public class GlobalEnums : MonoBehaviour
 
     public enum DamageType
     { 
-        True, 
         Physical,
         Holy,
         Lightning,
@@ -81,6 +109,15 @@ public class GlobalEnums : MonoBehaviour
         Cold,
         Blight,
         Mental,
+        True
+    }
+
+    public enum AbilityUpgradeStatus
+    { 
+        Inaccessible,
+        Available,
+        Unlocked,
+        Augmented
     }
 
     public enum ActionType
@@ -102,6 +139,12 @@ public class GlobalEnums : MonoBehaviour
         Protection,
         Dodge,
         Willpower
+    }
+
+    public enum ScalingFormula
+    { 
+        Standard,
+        Multiplication,
     }
 
 }

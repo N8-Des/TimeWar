@@ -7,23 +7,35 @@ using UnityEngine.Rendering.Universal;
 using static GlobalEnums;
 
 [System.Serializable]
-[CreateAssetMenu(menuName = "Abilities/StandardAbility")]
+[CreateAssetMenu(menuName = "Ability")]
 public class AbilityConfig : ScriptableObject
 {
 
     [Header("General Settings")]
     public bool isPassive = false;
-    public bool stunning = false;
+    public bool isStunning = false;
+    public bool isShoving = false;
+
+    public int stunDuration;
+    public float shoveDistance;
+
+
+    [Header("Stat Calculations")]
+    public StatScaling toHitFormula;
+    public StatScaling damageFormula;
+    public StatScaling saveFormula;
 
 
     [Header("Stats")]
     public string abilityName;
+    [TextArea(10, 10)]
     public string abilityDescription;
     public int cost;
     public int toHitModifier;
     public int damageModifier;
     public Sprite icon;
     public List<DamageRoll> damageRolls = new List<DamageRoll>();
+    public DamageType damageType;
     public ActionType actionType;
     public float attackRange;
     public MonoScript abilityType;
@@ -43,4 +55,8 @@ public class AbilityConfig : ScriptableObject
 
         return abilityType.GetClass();
     }
+
+
+
+
 }

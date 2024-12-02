@@ -30,6 +30,7 @@ public class CharacterGenerator : MonoBehaviour
 
             statBlocks[i].SetStatDisplay(cStats);
             characterStats.Add(cStats);
+            cStats.CreateStatList();
         }
     }
 

@@ -1,30 +1,88 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using static GlobalEnums;
 
 public class UpgradeTree : MonoBehaviour
 {
+
     public List<UpgradeColumn> columns = new();
     public List<GameObject> abilityTiers = new();
     public CharacterStats characterStats;
     public int classIndex;
     GlobalValues globalValues;
-    AbiliityDescription currentAbilityDescription;
-    AbilityUnlockButton currentAbilityButton;
+    AbilityDescription abilityDescription;
 
     private void Awake()
     {
         globalValues = FindObjectOfType<GlobalValues>();
+        ClearUpgradeTree();
+        PopulateUpgradeTree();
+    }
+
+
+    public void ClearUpgradeTree()
+    {
+        foreach (GameObject go in abilityTiers)
+        {
+            for (int i = 0; i < go.transform.childCount; i++)
+            {
+                Destroy(go.transform.GetChild(i).gameObject);
+            }
+        }
+    }
+
+    public void PopulateUpgradeTree()
+    {
+        int abilityLevelCap = globalValues.GetAbilityLevelCap(characterStats.level);
         for (int i = 0; i < columns.Count; i++)
         {
             for (int j = 0; j < columns[i].upgradesInColumn.Count; j++)
             {
                 GameObject abilityButton = Resources.Load<GameObject>("AbilityUnlockButton");
                 abilityButton = Instantiate(abilityButton);
+                AbilityUnlockButton abilityUnlockButton = abilityButton.GetComponent<AbilityUnlockButton>();
+                AbilityUnlock abilityUnlock = columns[i].upgradesInColumn[j];
+                abilityUnlockButton.Create(abilityUnlock, this, i);
+
+                if (CharacterHasAbilityOrAugment(abilityUnlock.ability) == AbilityUpgradeStatus.Unlocked)
+                {
+                    abilityUnlockButton.SetAsUpgraded();
+                }
+                else if (CharacterHasAbilityOrAugment(abilityUnlock.ability) == AbilityUpgradeStatus.Augmented)
+                {
+                    abilityUnlockButton.SetAsAugmented();
+                }
+
+
+                if (abilityLevelCap < i + 1)
+                {
+                    //can't use it yet
+                    abilityButton.GetComponent<Button>().enabled = true;
+                }
             }
         }
     }
 
+    public bool PurchaseUpgrade(Upgrade upgrade)
+    {
+        //can we actually purchase it?
+        if (characterStats.availableUpgradePoints >= upgrade.cost)
+        {
+            characterStats.availableUpgradePoints -= upgrade.cost;
+            characterStats.usedUpgradePoints += upgrade.cost;
+            upgrade.ApplyUpgrade(characterStats);
+            ClearUpgradeTree();
+            PopulateUpgradeTree();
+
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 
     public void CreateCharacter()
     {
@@ -35,11 +93,9 @@ public class UpgradeTree : MonoBehaviour
             classIndex = classIndex
         };
         GenerateStats(characterStats);
-
-
     }
 
-    public bool CharacterHasAbilityOrAugment(AbilityConfig ability)
+    public AbilityUpgradeStatus CharacterHasAbilityOrAugment(AbilityConfig ability)
     {
         foreach(int i in characterStats.abilityIndices)
         {
@@ -47,13 +103,17 @@ public class UpgradeTree : MonoBehaviour
             AbilityConfig characterAbility = globalValues.abilities[i];
 
             //if the ability we are checking matches either the ability of the character, or the pre-augmented version of it.
-            if (ability.abilityName == characterAbility.abilityName || 
-                characterAbility.augmentedAbility.abilityName == ability.abilityName)
+            if (ability.abilityName == characterAbility.abilityName)
             {
-                return true;
+                return AbilityUpgradeStatus.Unlocked;
             }
+            else if (characterAbility.augmentedAbility.abilityName == ability.abilityName)
+            {
+                return AbilityUpgradeStatus.Augmented;
+            }
+
         }
-        return false;
+        return AbilityUpgradeStatus.Available;
     }
 
 
@@ -64,28 +124,11 @@ public class UpgradeTree : MonoBehaviour
 
     }
 
-    public void SelectAbility(AbilityUnlockButton button)
+    public void SelectAbility(AbilityUnlock abilityUnlock)
     {
-        if (currentAbilityButton != null)
-        {
-            
-        }
-        currentAbilityButton = button;
-
-
+        abilityDescription.ClearAbilityDisplay();
+        abilityDescription.SetAbilityDisplay(abilityUnlock);
     }
-
-    public void HoverAbility(AbilityUnlockButton button)
-    {
-
-    }
-
-
-
-
-
-
-
 
     public void GenerateStats(CharacterStats c)
     {

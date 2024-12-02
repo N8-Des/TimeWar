@@ -13,13 +13,38 @@ MonoBehaviour:
   m_Name: BasicMeleeAbility
   m_EditorClassIdentifier: 
   isPassive: 0
+  isStunning: 0
+  isShoving: 0
+  stunDuration: 0
+  shoveDistance: 0
+  toHitFormula:
+    statType: 1
+    multiplier: 0.5
+    offset: -10
+    formula: 0
+  damageFormula:
+    statType: 1
+    multiplier: 0.25
+    offset: 0
+    formula: 1
+  saveFormula:
+    statType: 0
+    multiplier: 0
+    offset: 0
+    formula: 0
   abilityName: Slash
   abilityDescription: Slash with your sword at the target
   cost: 0
-  toHitModifier: 1
-  damageModifier: 0
+  toHitModifier: 2
+  damageModifier: 2
   icon: {fileID: 0}
+  damageRolls:
+  - numDice: 1
+    diceValue: 8
+    damageType: 0
+  damageType: 0
   actionType: 1
   attackRange: 3
-  stunning: 1
   abilityType: {fileID: 11500000, guid: 92e68d0b893a9964a89d58cf4b7c85d1, type: 3}
+  isAugment: 0
+  augmentedAbility: {fileID: 0}

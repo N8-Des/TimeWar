@@ -6,6 +6,8 @@ using UnityEngine;
 public class AbilityManager : MonoBehaviour
 {
     public List<AbilityBase> abilities = new List<AbilityBase>();
+    public List<AbilityBase> passives = new List<AbilityBase>();
+    public Character character;
 
     public void InitializeAbilities(List<AbilityConfig> abilityConfigs)
     {
@@ -14,8 +16,15 @@ public class AbilityManager : MonoBehaviour
             AbilityBase ability = CreateAbility(config);
             if (ability != null)
             {
-
-                abilities.Add(ability);
+                if (ability.config.isPassive)
+                {
+                    passives.Add(ability);
+                }
+                else
+                {
+                    abilities.Add(ability);
+                }
+                ability.Initialize(character);
             }
         }
     }
@@ -23,6 +32,7 @@ public class AbilityManager : MonoBehaviour
 
     private AbilityBase CreateAbility(AbilityConfig config)
     {
+        //get the type of the ability's AbilityBase
         Type abilityType = config.GetAbilityType();
         if (config.abilityType == null || !typeof(AbilityBase).IsAssignableFrom(abilityType))
         {

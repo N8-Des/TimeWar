@@ -14,6 +14,7 @@ public abstract class Upgrade :  ScriptableObject
 }
 
 [CreateAssetMenu(menuName = "Upgrades/StatUpgrade")]
+[System.Serializable]
 public class StatUpgrade : Upgrade
 {
     public int ValueIncrease;
@@ -60,29 +61,7 @@ public class StatUpgrade : Upgrade
     }
 }
 
-[CreateAssetMenu(menuName = "Upgrades/AbilityUnlock")]
-public class AbilityUnlock : Upgrade
-{
-    public AbilityConfig ability;
-    public List<AbilityAugment> augments = new List<AbilityAugment>();
 
-    public override void ApplyUpgrade(CharacterStats character)
-    {
-        throw new System.NotImplementedException();
-    }
-}
-
-[CreateAssetMenu(menuName = "Upgrades/AbiltyAugment")]
-public class AbilityAugment : Upgrade
-{
-    public AbilityConfig ability;
-    public AbilityConfig baseAbility;
-
-    public override void ApplyUpgrade(CharacterStats character)
-    {
-        throw new System.NotImplementedException();
-    }
-}
 
 
 
