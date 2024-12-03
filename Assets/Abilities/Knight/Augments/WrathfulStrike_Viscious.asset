@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89ab5fcf688c3a944bfbc4589e35e2f6, type: 3}
   m_Name: WrathfulStrike_Viscious
   m_EditorClassIdentifier: 
-  upgradeName: Precision Strike
+  upgradeName: Viscious Strike
   description: Additionally shreds the protection of the enemy
   cost: 6
   ability: {fileID: 11400000, guid: 1fa8c944ecb49bf44a84cf0df0c769ea, type: 2}

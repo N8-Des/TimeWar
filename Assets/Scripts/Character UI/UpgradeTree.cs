@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using static GlobalEnums;
@@ -10,12 +11,17 @@ public class UpgradeTree : MonoBehaviour
     public List<UpgradeColumn> columns = new();
     public List<GameObject> abilityTiers = new();
     public CharacterStats characterStats;
+    public CharacterLevelSet characterLevelManager;
     public int classIndex;
     GlobalValues globalValues;
-    AbilityDescription abilityDescription;
+    public AbilityDescription abilityDescription;
+    public TextMeshProUGUI pointDisplay;
+    AbilityUnlockButton abilityButton;
 
+ 
     private void Awake()
     {
+        characterLevelManager.uptree = this;
         globalValues = FindObjectOfType<GlobalValues>();
         ClearUpgradeTree();
         PopulateUpgradeTree();
@@ -45,6 +51,7 @@ public class UpgradeTree : MonoBehaviour
                 AbilityUnlockButton abilityUnlockButton = abilityButton.GetComponent<AbilityUnlockButton>();
                 AbilityUnlock abilityUnlock = columns[i].upgradesInColumn[j];
                 abilityUnlockButton.Create(abilityUnlock, this, i);
+                abilityButton.transform.parent = abilityTiers[i].transform;
 
                 if (CharacterHasAbilityOrAugment(abilityUnlock.ability) == AbilityUpgradeStatus.Unlocked)
                 {
@@ -52,7 +59,6 @@ public class UpgradeTree : MonoBehaviour
                 }
                 else if (CharacterHasAbilityOrAugment(abilityUnlock.ability) == AbilityUpgradeStatus.Augmented)
                 {
-                    abilityUnlockButton.SetAsAugmented();
                 }
 
 
@@ -72,9 +78,12 @@ public class UpgradeTree : MonoBehaviour
         {
             characterStats.availableUpgradePoints -= upgrade.cost;
             characterStats.usedUpgradePoints += upgrade.cost;
-            upgrade.ApplyUpgrade(characterStats);
+            int upgradeIndex = FindObjectOfType<GlobalValues>().GetAbilityIndex(upgrade.ability);
+            upgrade.ApplyUpgrade(characterStats, upgradeIndex);
+
             ClearUpgradeTree();
             PopulateUpgradeTree();
+            UpdatePointDisplay();
 
             return true;
         }
@@ -107,10 +116,14 @@ public class UpgradeTree : MonoBehaviour
             {
                 return AbilityUpgradeStatus.Unlocked;
             }
-            else if (characterAbility.augmentedAbility.abilityName == ability.abilityName)
+            if (characterAbility.augmentedAbility != null)
             {
-                return AbilityUpgradeStatus.Augmented;
+                if (characterAbility.augmentedAbility.abilityName == ability.abilityName)
+                {
+                    return AbilityUpgradeStatus.Augmented;
+                }
             }
+           
 
         }
         return AbilityUpgradeStatus.Available;
@@ -124,10 +137,16 @@ public class UpgradeTree : MonoBehaviour
 
     }
 
-    public void SelectAbility(AbilityUnlock abilityUnlock)
+    public void SelectAbility(AbilityUnlock abilityUnlock, AbilityUnlockButton button)
     {
+        if (abilityButton != null)
+        {
+            abilityButton.SetSelected(false);
+        }
         abilityDescription.ClearAbilityDisplay();
+        abilityDescription.gameObject.SetActive(true);
         abilityDescription.SetAbilityDisplay(abilityUnlock);
+        abilityButton = button;
     }
 
     public void GenerateStats(CharacterStats c)
@@ -161,6 +180,21 @@ public class UpgradeTree : MonoBehaviour
                 c.abilityIndices.Add(index);
             }
         }
+    }
+
+    public void SetCharacterLevel(int level)
+    {
+        characterStats.level = level;
+        characterStats.availableUpgradePoints = level * 4;
+        characterStats.usedUpgradePoints = 0;
+        ClearUpgradeTree();
+        PopulateUpgradeTree();
+        UpdatePointDisplay();
+    }
+
+    public void UpdatePointDisplay()
+    {
+        pointDisplay.text = "Available Points: " + characterStats.availableUpgradePoints;
     }
 }
 

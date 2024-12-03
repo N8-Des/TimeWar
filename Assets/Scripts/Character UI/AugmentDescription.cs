@@ -9,6 +9,7 @@ public class AugmentDescription : MonoBehaviour
     public TextMeshProUGUI augmentName;
     public TextMeshProUGUI augmentDescription;
     public TextMeshProUGUI augmentCost;
+    public Image icon;
     public AbilityAugment augment;
 
     
@@ -19,6 +20,10 @@ public class AugmentDescription : MonoBehaviour
         augment = newAugment;
         augmentName.text = newAugment.upgradeName;
         augmentDescription.text = newAugment.description;
+        if (newAugment.ability.icon != null)
+        {
+            icon.sprite = newAugment.ability.icon;
+        }
         augmentCost.text = augment.cost + " AP";
         uptree = tree;
     }

@@ -37,4 +37,13 @@ public class CharacterCreator : MonoBehaviour
         classTrees[classSelected].gameObject.SetActive(true);
         classSelectorPanel.SetActive(false);
     }
+
+    public void ChangeClass()
+    {
+        foreach(UpgradeTree upgradeTree in classTrees)
+        {
+            upgradeTree.gameObject.SetActive(false);
+            classSelectorPanel.SetActive(true);
+        }
+    }
 }

@@ -23,4 +23,16 @@ public class GlobalValues : MonoBehaviour
         if (level >= 10 && level <= 14) return 4;
         return 5;
     }
+
+    public int GetAbilityIndex(AbilityConfig ability)
+    {
+        for (int i = 0; i < abilities.Count; i++)
+        {
+            if (abilities[i].abilityName == ability.abilityName)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
 }

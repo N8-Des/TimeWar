@@ -6,11 +6,10 @@ using UnityEngine;
 [System.Serializable]
 public class AbilityUnlock : Upgrade
 {
-    public AbilityConfig ability;
     public List<AbilityAugment> augments = new List<AbilityAugment>();
 
-    public override void ApplyUpgrade(CharacterStats character)
+    public override void ApplyUpgrade(CharacterStats character, int index)
     {
-        throw new System.NotImplementedException();
+        character.abilityIndices.Add(index);
     }
 }

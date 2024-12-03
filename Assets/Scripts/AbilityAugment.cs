@@ -6,10 +6,9 @@ using UnityEngine;
 [System.Serializable]
 public class AbilityAugment : Upgrade
 {
-    public AbilityConfig ability;
     public AbilityConfig baseAbility;
 
-    public override void ApplyUpgrade(CharacterStats character)
+    public override void ApplyUpgrade(CharacterStats character, int index)
     {
         throw new System.NotImplementedException();
     }

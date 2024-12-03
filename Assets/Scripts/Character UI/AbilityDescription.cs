@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using static GlobalEnums;
+using static UnityEngine.Rendering.HableCurve;
 
 public class AbilityDescription : MonoBehaviour
 {
@@ -11,7 +12,8 @@ public class AbilityDescription : MonoBehaviour
     public TextMeshProUGUI abilityDescription;
     public Image abilityIcon;
     public Button selectButton;
-    public HorizontalLayoutGroup augmentHandler;
+    public TextMeshProUGUI abilityCost;
+    public VerticalLayoutGroup augmentHandler;
     public UpgradeTree uptree;
     public Upgrade selectedUpgrade;
 
@@ -27,7 +29,9 @@ public class AbilityDescription : MonoBehaviour
         {
             abilityIcon.sprite = ability.icon;
         }
-        foreach(AbilityAugment augment in upgrade.augments)
+        abilityCost.text = upgrade.cost + " AP";
+
+        foreach (AbilityAugment augment in upgrade.augments)
         {
             //create augment buttons
             GameObject augmentButton = Resources.Load<GameObject>("AugmentButton");
@@ -45,7 +49,7 @@ public class AbilityDescription : MonoBehaviour
 
         if (uptree.CharacterHasAbilityOrAugment(ability) is AbilityUpgradeStatus.Unlocked or AbilityUpgradeStatus.Augmented)
         {
-            selectButton.enabled = false;
+
         }
     }
 
@@ -58,7 +62,10 @@ public class AbilityDescription : MonoBehaviour
         augmentDescription.gameObject.SetActive(false);
     }
 
-
+    public void OnUnlockButton()
+    {
+        uptree.PurchaseUpgrade(selectedUpgrade);
+    }
 
     public void SetAugmentDescription(AbilityAugment augment)
     {

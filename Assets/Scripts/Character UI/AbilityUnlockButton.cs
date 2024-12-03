@@ -9,10 +9,14 @@ public class AbilityUnlockButton : MonoBehaviour
     public AbilityUnlock upgrade;
     public UpgradeTree myTree;
     public Image abilityIcon;
+    public Image abilityHoverSpin;
+    public float rotationSpeed = 1f;
+
+    public Sprite unlockedAbilityIcon;
+
     int abilityTier;
     bool isSelected = false;
-    public Sprite unlockedAbilityIcon;
-    public Sprite augmentedAbilityIcon;
+
 
     public void Create(AbilityUnlock ability, UpgradeTree tree, int tier)
     {
@@ -27,8 +31,8 @@ public class AbilityUnlockButton : MonoBehaviour
 
     public void OnClick()
     {
-        myTree.SelectAbility(upgrade);
-        isSelected = true;
+        myTree.SelectAbility(upgrade, this);
+        SetSelected(true);
     }
 
     public void SetAsUpgraded()
@@ -38,11 +42,21 @@ public class AbilityUnlockButton : MonoBehaviour
 
     public void SetAsAugmented()
     {
-        GetComponent<Image>().sprite = augmentedAbilityIcon;
+        //nothing yet, maybe ever  
     }
 
     public void SetSelected(bool selected)
     {
         isSelected = selected;
+        abilityHoverSpin.gameObject.SetActive(selected);
+    }
+
+    private void Update()
+    {
+        if (isSelected)
+        {
+            abilityHoverSpin.rectTransform.eulerAngles -= Vector3.forward * Time.deltaTime * rotationSpeed;
+            abilityHoverSpin.gameObject.SetActive(true);
+        }
     }
 }
