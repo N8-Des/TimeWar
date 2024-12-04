@@ -45,11 +45,24 @@ public class AbilityDescription : MonoBehaviour
             {
                 button.icon.sprite = augment.ability.icon;
             }
+            if (uptree.CharacterHasAbilityOrAugment(ability) == AbilityUpgradeStatus.Augmented)
+            {
+                if (uptree.characterStats.abilityIndices.Contains(AbilityRegistry.GetIDByAbility(augment.ability)))
+                {
+                    button.SetUpgraded();
+                }
+            }
         }
 
         if (uptree.CharacterHasAbilityOrAugment(ability) is AbilityUpgradeStatus.Unlocked or AbilityUpgradeStatus.Augmented)
         {
-
+            selectButton.interactable = false;
+            selectButton.GetComponentInChildren<TextMeshProUGUI>().color = Color.gray;
+        }
+        else
+        {
+            selectButton.interactable = true;
+            selectButton.GetComponentInChildren<TextMeshProUGUI>().color = Color.white;
         }
     }
 

@@ -36,6 +36,8 @@ public class UpgradeTree : MonoBehaviour
             {
                 Destroy(go.transform.GetChild(i).gameObject);
             }
+            abilityDescription.gameObject.SetActive(false);
+            abilityDescription.augmentDescription.gameObject.SetActive(false);
         }
     }
 
@@ -78,7 +80,8 @@ public class UpgradeTree : MonoBehaviour
         {
             characterStats.availableUpgradePoints -= upgrade.cost;
             characterStats.usedUpgradePoints += upgrade.cost;
-            int upgradeIndex = FindObjectOfType<GlobalValues>().GetAbilityIndex(upgrade.ability);
+            int upgradeIndex = AbilityRegistry.GetIDByAbility(upgrade.ability);
+
             upgrade.ApplyUpgrade(characterStats, upgradeIndex);
 
             ClearUpgradeTree();
@@ -92,6 +95,28 @@ public class UpgradeTree : MonoBehaviour
             return false;
         }
     }
+
+    public bool PurchaseAugment(AbilityAugment augment)
+    {
+        int baseAbility = AbilityRegistry.GetIDByAbility(augment.baseAbility);
+
+        if(characterStats.availableUpgradePoints >= augment.cost && characterStats.abilityIndices.Contains(baseAbility))
+        {
+            characterStats.availableUpgradePoints -= augment.cost;
+            characterStats.usedUpgradePoints += augment.cost;
+            int upgradeIndex = AbilityRegistry.GetIDByAbility(augment.ability);
+
+            augment.ApplyUpgrade(characterStats, upgradeIndex);
+
+            ClearUpgradeTree();
+            PopulateUpgradeTree();
+            UpdatePointDisplay();
+            return true;
+        }
+
+        return false;
+    }
+
 
     public void CreateCharacter()
     {
@@ -109,13 +134,8 @@ public class UpgradeTree : MonoBehaviour
         foreach(int i in characterStats.abilityIndices)
         {
             //the ability on the character already
-            AbilityConfig characterAbility = globalValues.abilities[i];
-
-            //if the ability we are checking matches either the ability of the character, or the pre-augmented version of it.
-            if (ability.abilityName == characterAbility.abilityName)
-            {
-                return AbilityUpgradeStatus.Unlocked;
-            }
+            AbilityConfig characterAbility = AbilityRegistry.GetAbilityByID(i);
+            //check if the ability in the characterStats ability list is an augmented ability
             if (characterAbility.augmentedAbility != null)
             {
                 if (characterAbility.augmentedAbility.abilityName == ability.abilityName)
@@ -123,6 +143,13 @@ public class UpgradeTree : MonoBehaviour
                     return AbilityUpgradeStatus.Augmented;
                 }
             }
+
+            //if the ability we are checking matches either the ability of the character, or the pre-augmented version of it.
+            if (ability.abilityName == characterAbility.abilityName)
+            {
+                return AbilityUpgradeStatus.Unlocked;
+            }
+
            
 
         }
@@ -166,19 +193,9 @@ public class UpgradeTree : MonoBehaviour
         //this system sucks but it works at the scale I have
         foreach (AbilityConfig abilityConfig in cClass.defaultAbilities)
         {
-            int index = -1;
-            for (int i = 0; i < globalValues.abilities.Count; i++)
-            {
-                if (globalValues.abilities[i].name == abilityConfig.name)
-                {
-                    index = i;
-                    break;
-                }
-            }
-            if (index != -1)
-            {
-                c.abilityIndices.Add(index);
-            }
+            int index = AbilityRegistry.GetIDByAbility(abilityConfig);
+            c.abilityIndices.Add(index);
+
         }
     }
 
@@ -187,6 +204,7 @@ public class UpgradeTree : MonoBehaviour
         characterStats.level = level;
         characterStats.availableUpgradePoints = level * 4;
         characterStats.usedUpgradePoints = 0;
+        characterStats.abilityIndices.Clear();
         ClearUpgradeTree();
         PopulateUpgradeTree();
         UpdatePointDisplay();

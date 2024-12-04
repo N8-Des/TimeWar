@@ -53,7 +53,7 @@ public class CharacterSaveLoadManager : MonoBehaviour
                 List<AbilityConfig> abilities = new List<AbilityConfig>();
                 foreach (int index in stats.abilityIndices)
                 {
-                    abilities.Add(globalValues.abilities[index]);
+                    abilities.Add(AbilityRegistry.GetAbilityByID(index));
                 }
                 defaultCharacter.GetComponent<AbilityManager>().InitializeAbilities(abilities);
             }

@@ -10,13 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9324fc9c685995d41839d6960595f46d, type: 3}
-  m_Name: PrecisonStrike
+  m_Name: ShieldBashShove
   m_EditorClassIdentifier: 
   isPassive: 0
-  isStunning: 0
-  isShoving: 0
-  stunDuration: 0
-  shoveDistance: 0
+  isStunning: 1
+  isShoving: 1
+  passiveInUpdate: 0
+  stunDuration: 1
+  shoveDistance: 5
   toHitFormula:
     statType: 1
     multiplier: 0.5
@@ -24,27 +25,28 @@ MonoBehaviour:
     formula: 0
   damageFormula:
     statType: 1
-    multiplier: 0.4
+    multiplier: 0.25
     offset: 0
-    formula: 0
+    formula: 1
   saveFormula:
-    statType: 0
-    multiplier: 0
-    offset: 0
+    statType: 1
+    multiplier: 0.5
+    offset: -12
     formula: 0
-  abilityName: Precision Strike
-  abilityDescription: Deliver a massive strike of holy damage with no accuracy penalty.
-  cost: 6
+  abilityName: Shield Shove
+  abilityDescription: Slam an enemy with your sheild, shoving them. There is also
+    a chance to stun them. Stun chance scales with POWER.
+  cost: 0
   toHitModifier: 1
-  damageModifier: 4
-  icon: {fileID: 0}
+  damageModifier: 0
+  icon: {fileID: 21300000, guid: 8d924c1e43480544f8e3c848ef91cf02, type: 3}
   damageRolls:
-  - numDice: 2
-    diceValue: 10
-    damageType: 1
+  - numDice: 1
+    diceValue: 6
+    damageType: 0
   damageType: 0
   actionType: 1
   attackRange: 3
   abilityType: {fileID: 11500000, guid: 92e68d0b893a9964a89d58cf4b7c85d1, type: 3}
-  isAugment: 0
-  augmentedAbility: {fileID: 0}
+  isAugment: 1
+  augmentedAbility: {fileID: 11400000, guid: 99060dde445277049af9b08b176068ee, type: 2}

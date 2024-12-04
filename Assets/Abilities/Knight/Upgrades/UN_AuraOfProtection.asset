@@ -17,5 +17,5 @@ MonoBehaviour:
   cost: 4
   ability: {fileID: 11400000, guid: 9b95123f6b41ccd41b75b5cdf920bc89, type: 2}
   augments:
-  - {fileID: 11400000, guid: db68f4d4274ecbc4f990d8500558ba33, type: 2}
-  - {fileID: 11400000, guid: 74bb19aed5c5ba342838044a36d02f94, type: 2}
+  - {fileID: 11400000, guid: 5650113423749a94185f9e4f378f2a48, type: 2}
+  - {fileID: 11400000, guid: 40213d47f123f1348b03c2fd34177fbc, type: 2}

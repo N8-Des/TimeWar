@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static GlobalEnums;
 
 public class AugmentDescription : MonoBehaviour
 {
@@ -11,7 +12,7 @@ public class AugmentDescription : MonoBehaviour
     public TextMeshProUGUI augmentCost;
     public Image icon;
     public AbilityAugment augment;
-
+    public Button unlockButton;
     
     UpgradeTree uptree;
 
@@ -26,10 +27,21 @@ public class AugmentDescription : MonoBehaviour
         }
         augmentCost.text = augment.cost + " AP";
         uptree = tree;
+
+        if (uptree.CharacterHasAbilityOrAugment(augment.baseAbility) is AbilityUpgradeStatus.Augmented)
+        {
+            unlockButton.interactable = false;
+            unlockButton.GetComponentInChildren<TextMeshProUGUI>().color = Color.gray;
+        }
+        else
+        {
+            unlockButton.interactable = true;
+            unlockButton.GetComponentInChildren<TextMeshProUGUI>().color = Color.white;
+        }
     }
 
     public void OnUnlockButton()
     {
-        uptree.PurchaseUpgrade(augment);
+        uptree.PurchaseAugment(augment);
     }
 }

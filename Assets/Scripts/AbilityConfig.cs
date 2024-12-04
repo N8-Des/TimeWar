@@ -15,6 +15,7 @@ public class AbilityConfig : ScriptableObject
     public bool isPassive = false;
     public bool isStunning = false;
     public bool isShoving = false;
+    public bool passiveInUpdate = false;
 
     public int stunDuration;
     public float shoveDistance;

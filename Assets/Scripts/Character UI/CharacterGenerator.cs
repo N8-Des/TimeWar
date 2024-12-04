@@ -48,23 +48,10 @@ public class CharacterGenerator : MonoBehaviour
         c.Dodge.baseValue = cClass.dodgeScore;
 
 
-        //ability lookup
-        //this system sucks but it works at the scale I have
         foreach (AbilityConfig abilityConfig in cClass.defaultAbilities)
         {
-            int index = -1;
-            for (int i = 0; i < globalValues.abilities.Count; i++)
-            {
-                if (globalValues.abilities[i].name == abilityConfig.name) 
-                {
-                    index = i;
-                    break;
-                }
-            }
-            if (index != -1)
-            {
-                c.abilityIndices.Add(index);
-            }
+            int index = AbilityRegistry.GetIDByAbility(abilityConfig);
+            c.abilityIndices.Add(index);
         }
     }
 }

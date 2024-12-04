@@ -13,14 +13,33 @@ MonoBehaviour:
   m_Name: Aura Of Protection
   m_EditorClassIdentifier: 
   isPassive: 1
-  stunning: 0
+  isStunning: 0
+  isShoving: 0
+  passiveInUpdate: 0
+  stunDuration: 0
+  shoveDistance: 0
+  toHitFormula:
+    statType: 0
+    multiplier: 0
+    offset: 0
+    formula: 0
+  damageFormula:
+    statType: 0
+    multiplier: 0
+    offset: 0
+    formula: 0
+  saveFormula:
+    statType: 0
+    multiplier: 0
+    offset: 0
+    formula: 0
   abilityName: Aura of Protection
-  abilityDescription: Allies within 8 meters gain a +1 to their protection and +10
-    to their dodge
+  abilityDescription: Allies within 8 meters gain a +1 to their PROT and DODGE
   cost: 0
   toHitModifier: 0
   damageModifier: 1
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 78d6cac616c14b241921b8f3bdc036ec, type: 3}
+  damageRolls: []
   damageType: 0
   actionType: 0
   attackRange: 8

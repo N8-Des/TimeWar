@@ -10,6 +10,16 @@ public class AbilityAugment : Upgrade
 
     public override void ApplyUpgrade(CharacterStats character, int index)
     {
-        throw new System.NotImplementedException();
+        int baseID = AbilityRegistry.GetIDByAbility(baseAbility);
+        int myID = AbilityRegistry.GetIDByAbility(ability);
+        foreach (int i in character.abilityIndices)
+        {
+            if (i == baseID)
+            {
+                character.abilityIndices.Remove(i);
+                character.abilityIndices.Add(myID);
+                return;
+            }
+        }
     }
 }

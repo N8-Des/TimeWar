@@ -15,6 +15,7 @@ MonoBehaviour:
   isPassive: 0
   isStunning: 1
   isShoving: 0
+  passiveInUpdate: 0
   stunDuration: 1
   shoveDistance: 0
   toHitFormula:
@@ -38,7 +39,7 @@ MonoBehaviour:
   cost: 0
   toHitModifier: 1
   damageModifier: 0
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 8d924c1e43480544f8e3c848ef91cf02, type: 3}
   damageRolls:
   - numDice: 1
     diceValue: 6

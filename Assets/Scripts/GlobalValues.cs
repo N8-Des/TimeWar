@@ -6,12 +6,11 @@ using UnityEngine.Windows;
 public class GlobalValues : MonoBehaviour
 {
     public List<CharacterClass> classes = new List<CharacterClass>();
-    public List<AbilityConfig> abilities = new List<AbilityConfig>();
-
 
     void Start()
     {
         DontDestroyOnLoad(this);
+        AbilityRegistry.InitializeAbilities();
     }
 
     public int GetAbilityLevelCap(int level)
@@ -24,15 +23,4 @@ public class GlobalValues : MonoBehaviour
         return 5;
     }
 
-    public int GetAbilityIndex(AbilityConfig ability)
-    {
-        for (int i = 0; i < abilities.Count; i++)
-        {
-            if (abilities[i].abilityName == ability.abilityName)
-            {
-                return i;
-            }
-        }
-        return -1;
-    }
 }

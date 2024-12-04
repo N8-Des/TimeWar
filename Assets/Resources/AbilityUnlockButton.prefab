@@ -229,7 +229,7 @@ MonoBehaviour:
   abilityIcon: {fileID: 7608214766964204617}
   abilityHoverSpin: {fileID: 1209134695}
   rotationSpeed: 50
-  unlockedAbilityIcon: {fileID: 21300000, guid: 0e8cf465d4269c14aaae5b40dd7dec20, type: 3}
+  unlockedAbilityIcon: {fileID: 21300000, guid: 97a824edc6d70d74aa941f6714377425, type: 3}
 --- !u!1 &7608214766964204619
 GameObject:
   m_ObjectHideFlags: 0
